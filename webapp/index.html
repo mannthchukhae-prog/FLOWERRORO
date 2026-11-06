@@ -3,238 +3,404 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Цена букета</title>
+<title>Цена цветка</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    --accent: #c2567f;
-    --accent-soft: #f7e3ec;
+    --green: #2f9e63;
+    --green-deep: #1e7a4a;
+    --ink: #16301f;
+    --muted: #7b9384;
+    --glass: rgba(255, 255, 255, .58);
+    --glass-strong: rgba(255, 255, 255, .78);
+    --stroke: rgba(47, 158, 99, .18);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
   body {
     font-family: -apple-system, 'SF Pro Text', Roboto, sans-serif;
-    background: var(--tg-theme-bg-color, #fff);
-    color: var(--tg-theme-text-color, #111);
-    padding: 12px 14px 90px;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 14px 14px 110px;
+    background:
+      radial-gradient(1200px 500px at 85% -10%, rgba(47,158,99,.20), transparent 60%),
+      radial-gradient(900px 420px at -20% 25%, rgba(120,200,150,.18), transparent 55%),
+      radial-gradient(700px 500px at 110% 60%, rgba(47,158,99,.12), transparent 50%),
+      linear-gradient(180deg, #fbfefc 0%, #f2faf4 100%);
+    background-attachment: fixed;
   }
-  h1 { font-size: 19px; margin: 6px 0 14px; }
-  h1 span { color: var(--accent); }
 
-  .tabs {
-    display: flex; gap: 6px; margin-bottom: 16px;
-    background: var(--tg-theme-secondary-bg-color, #f2f2f5);
-    padding: 4px; border-radius: 12px;
+  /* ---------- многослойное стекло ---------- */
+  .glass {
+    position: relative;
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid var(--stroke);
+    border-radius: 22px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 30px rgba(30, 122, 74, .08), inset 0 1px 0 rgba(255,255,255,.8);
   }
-  .tabs button {
-    flex: 1; border: 0; padding: 9px 0; border-radius: 9px;
-    font-size: 14px; font-weight: 600; background: transparent;
-    color: var(--tg-theme-hint-color, #888); cursor: pointer;
+  .glass::before {   /* верхний полупрозрачный слой */
+    content: ""; position: absolute; inset: 0; border-radius: 22px;
+    background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0) 45%);
+    pointer-events: none;
   }
-  .tabs button.active {
-    background: var(--tg-theme-bg-color, #fff);
-    color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  }
-  .page { display: none; }
-  .page.active { display: block; }
+  .glass .inner { position: relative; }  /* контент поверх слоёв */
 
-  .card {
-    background: var(--tg-theme-secondary-bg-color, #f7f7f9);
-    border-radius: 14px; padding: 14px; margin-bottom: 12px;
+  h1 { font-size: 21px; margin: 4px 0 2px; font-weight: 800; }
+  h1 span { color: var(--green); }
+  .tagline { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+  h2 {
+    font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--green-deep); margin-bottom: 12px; font-weight: 700;
   }
-  .card h2 { font-size: 14px; margin-bottom: 10px; color: var(--tg-theme-hint-color, #888); font-weight: 600; }
 
-  label { display: block; font-size: 12px; color: var(--tg-theme-hint-color, #888); margin: 8px 0 3px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
   input, select {
-    width: 100%; padding: 10px 12px; border-radius: 10px; font-size: 16px;
-    border: 1px solid rgba(0,0,0,.08);
-    background: var(--tg-theme-bg-color, #fff);
-    color: var(--tg-theme-text-color, #111);
-    outline: none;
+    width: 100%; padding: 11px 13px; border-radius: 13px; font-size: 16px;
+    border: 1px solid var(--stroke);
+    background: var(--glass-strong);
+    color: var(--ink); outline: none;
   }
-  input:focus { border-color: var(--accent); }
+  input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(47,158,99,.12); }
   .row { display: flex; gap: 8px; }
   .row > div { flex: 1; }
 
+  .seg { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+  .seg button {
+    flex: 1; min-width: 90px; padding: 9px 6px; border-radius: 12px;
+    border: 1px solid var(--stroke); background: var(--glass-strong);
+    font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer;
+  }
+  .seg button.on {
+    background: linear-gradient(135deg, var(--green), var(--green-deep));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 14px rgba(47,158,99,.35);
+  }
+
+  .chip {
+    display: inline-block; padding: 4px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; margin-top: 6px;
+    background: rgba(47,158,99,.12); color: var(--green-deep);
+    border: 1px solid var(--stroke);
+  }
+  .chip.t1 { background: rgba(194,86,127,.10); color: #a4406a; border-color: rgba(194,86,127,.2); }
+  .chip.detail { background: rgba(216,150,43,.12); color: #a8741c; border-color: rgba(216,150,43,.25); }
+
   button.primary {
-    width: 100%; padding: 13px; border: 0; border-radius: 12px;
-    background: var(--accent); color: #fff; font-size: 16px; font-weight: 700;
-    margin-top: 10px; cursor: pointer;
-  }
-  button.ghost {
-    border: 0; background: transparent; color: var(--accent);
-    font-size: 14px; font-weight: 600; padding: 8px; cursor: pointer;
+    width: 100%; padding: 13px; border: 0; border-radius: 14px;
+    background: linear-gradient(135deg, var(--green), var(--green-deep));
+    color: #fff; font-size: 16px; font-weight: 700; margin-top: 12px;
+    cursor: pointer; box-shadow: 0 6px 18px rgba(47,158,99,.35);
   }
 
-  .flower-line {
+  /* ---------- герой с ценой ---------- */
+  .hero {
+    text-align: center; padding: 24px 16px 20px; border-radius: 24px;
+    background:
+      radial-gradient(400px 200px at 80% 0%, rgba(255,255,255,.35), transparent 60%),
+      linear-gradient(150deg, #37a868, #166b3f);
+    color: #fff; margin-bottom: 14px; position: relative; overflow: hidden;
+    box-shadow: 0 12px 34px rgba(30,122,74,.30);
+  }
+  .hero::after {
+    content: "🌿"; position: absolute; right: -14px; bottom: -22px;
+    font-size: 110px; opacity: .14;
+  }
+  .hero .val { font-size: 44px; font-weight: 800; letter-spacing: .5px; }
+  .hero .sub { font-size: 13px; opacity: .9; margin-top: 3px; }
+  .hero .alt { font-size: 12px; opacity: .75; margin-top: 8px; }
+
+  /* ---------- строки ---------- */
+  .line-item {
     display: flex; align-items: center; gap: 8px; padding: 9px 0;
-    border-bottom: 1px solid rgba(0,0,0,.05);
+    border-bottom: 1px dashed rgba(30,122,74,.14);
   }
-  .flower-line:last-child { border-bottom: 0; }
-  .flower-line .nm { flex: 1; font-size: 15px; }
-  .flower-line .nm small { display: block; color: var(--tg-theme-hint-color, #999); font-size: 12px; }
-  .qty { display: flex; align-items: center; gap: 8px; }
+  .line-item:last-child { border-bottom: 0; }
+  .line-item .nm { flex: 1; font-size: 15px; }
+  .line-item .nm small { display: block; color: var(--muted); font-size: 12px; }
+  .qty { display: flex; align-items: center; gap: 9px; }
   .qty button {
-    width: 30px; height: 30px; border-radius: 50%; border: 0; font-size: 17px;
-    background: var(--accent-soft); color: var(--accent); font-weight: 700; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--stroke);
+    background: var(--glass-strong); color: var(--green-deep);
+    font-size: 17px; font-weight: 700; cursor: pointer;
   }
-  .qty b { min-width: 20px; text-align: center; font-size: 15px; }
-  .del { color: #d33; font-size: 17px; border: 0; background: none; cursor: pointer; padding: 4px; }
-
-  .price-hero {
-    text-align: center; padding: 18px 14px; border-radius: 16px;
-    background: linear-gradient(135deg, #c2567f, #8e3a5e);
-    color: #fff; margin-bottom: 12px;
-  }
-  .price-hero .val { font-size: 38px; font-weight: 800; letter-spacing: .5px; }
-  .price-hero .sub { font-size: 13px; opacity: .85; margin-top: 2px; }
+  .qty b { min-width: 22px; text-align: center; font-size: 15px; }
+  .del { color: #c0392b; font-size: 16px; border: 0; background: none; cursor: pointer; padding: 4px; }
 
   .break { font-size: 13.5px; }
-  .break .line {
+  .break .l {
     display: flex; justify-content: space-between; padding: 6px 0;
-    border-bottom: 1px dashed rgba(0,0,0,.07);
+    border-bottom: 1px dashed rgba(30,122,74,.12);
   }
-  .break .line:last-child { border-bottom: 0; }
-  .break .line b { font-variant-numeric: tabular-nums; }
-  .break .line.profit { color: #1c8a4b; font-weight: 700; }
+  .break .l:last-child { border-bottom: 0; }
+  .break .l b { font-variant-numeric: tabular-nums; }
+  .break .l.profit { color: var(--green-deep); font-weight: 800; font-size: 15px; }
 
-  .seg { display: flex; gap: 6px; margin-top: 4px; }
-  .seg button {
-    flex: 1; padding: 8px; border-radius: 9px; border: 1px solid rgba(0,0,0,.1);
-    background: var(--tg-theme-bg-color,#fff); font-size: 13px; cursor: pointer;
-    color: var(--tg-theme-text-color,#111);
+  details.glass { padding: 0; overflow: hidden; }
+  details.glass summary {
+    list-style: none; cursor: pointer; padding: 15px 16px;
+    font-weight: 700; font-size: 14.5px; color: var(--green-deep);
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .seg button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .alt-price { text-align: center; font-size: 13px; color: var(--tg-theme-hint-color,#888); margin-top: 8px; }
-  .hint { font-size: 12px; color: var(--tg-theme-hint-color, #999); margin-top: 6px; }
+  details.glass summary::after { content: "＋"; font-size: 18px; opacity: .5; }
+  details.glass[open] summary::after { content: "－"; }
+  details.glass .body { padding: 0 16px 16px; }
+
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.45; }
+  .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tier-grid > div { font-size: 13px; }
+  .src-link { font-size: 12px; color: var(--green-deep); text-decoration: none; }
 </style>
 </head>
 <body>
 
-<h1>💐 Калькулятор <span>цены букета</span></h1>
+<h1>💐 Цена <span>цветка</span></h1>
+<div class="tagline">Введите название и закупочную цену стебля — всё остальное уже зашито: налоги, доставка, зарплаты, упаковка и ваша маржа.</div>
 
-<div class="tabs">
-  <button id="tab-calc" class="active" onclick="showPage('calc')">Букет</button>
-  <button id="tab-flowers" onclick="showPage('flowers')">Цветы</button>
-  <button id="tab-settings" onclick="showPage('settings')">Настройки</button>
+<!-- ================= ЦЕНА СТЕБЛЯ ================= -->
+<div class="glass"><div class="inner">
+  <h2>Расчёт стебля</h2>
+  <label>Название цветка</label>
+  <input id="stem-name" list="flower-names" placeholder="Начните вводить: роза, гортензия…" oninput="onNameInput()">
+  <datalist id="flower-names"></datalist>
+  <div id="tier-chip"></div>
+  <div id="tier-pick" style="display:none">
+    <label>Не нашли в справочнике — выберите план вручную:</label>
+    <div class="seg" id="seg-tier-manual">
+      <button data-v="t1" onclick="manualTier('t1')">1-й план</button>
+      <button data-v="t2" onclick="manualTier('t2')">2-й план</button>
+      <button data-v="detail" onclick="manualTier('detail')">Деталь</button>
+      <button data-v="green" onclick="manualTier('green')">Зелень</button>
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Закупка за стебель, ₽</label>
+      <input id="stem-price" type="number" min="0" inputmode="decimal" placeholder="130" oninput="recalcStem()">
+    </div>
+    <div>
+      <label>Кол-во в букет</label>
+      <input id="stem-qty" type="number" min="1" value="5" inputmode="numeric" oninput="recalcStem()">
+    </div>
+  </div>
+
+  <div id="stem-result"></div>
+  <button class="primary" id="btn-add" onclick="addToBouquet()" style="display:none">＋ Добавить в букет</button>
+</div></div>
+
+<!-- ================= БУКЕТ ================= -->
+<div class="hero">
+  <div class="val" id="hero-price">0 ₽</div>
+  <div class="sub" id="hero-sub">соберите букет из стеблей выше</div>
+  <div class="alt" id="hero-alt"></div>
 </div>
 
-<!-- ============ КАЛЬКУЛЯТОР ============ -->
-<div class="page active" id="page-calc">
-  <div class="price-hero">
-    <div class="val" id="hero-price">0 ₽</div>
-    <div class="sub" id="hero-sub">добавьте цветы в букет</div>
-  </div>
-  <div class="alt-price" id="alt-price"></div>
+<div class="glass"><div class="inner">
+  <h2>Состав букета</h2>
+  <div id="bouquet-list"></div>
+  <label>Общая упаковка букета (бумага, ленты, открытка), ₽</label>
+  <input id="extra-pack" type="number" min="0" value="150" oninput="recalcBouquet()">
+</div></div>
 
-  <div class="card">
-    <h2>СОСТАВ БУКЕТА</h2>
-    <div id="calc-flowers"></div>
-    <label>Общая упаковка букета, ₽</label>
-    <input type="number" id="extra-pack" value="150" min="0" oninput="recalc()">
-  </div>
+<div class="glass"><div class="inner">
+  <h2>Что зашито в цену букета</h2>
+  <div class="break" id="breakdown"></div>
+</div></div>
 
-  <div class="card">
-    <h2>ЧТО ЗАШИТО В ЦЕНУ</h2>
-    <div class="break" id="breakdown"></div>
+<!-- ================= НАСТРОЙКИ ================= -->
+<details class="glass" open><summary>⚙️ Налоги</summary><div class="body inner">
+  <label>Объект УСН</label>
+  <div class="seg" id="seg-tax">
+    <button data-v="usn6" onclick="setSeg('tax_mode','usn6')">Доходы 6%</button>
+    <button data-v="usn15" onclick="setSeg('tax_mode','usn15')">Дох.−расх. 15%</button>
   </div>
-</div>
+  <label>НДС</label>
+  <div class="seg" id="seg-vat">
+    <button data-v="on" onclick="setVatOn(true)">Плачу НДС</button>
+    <button data-v="off" onclick="setVatOn(false)">Нет НДС (доход &lt; 20 млн)</button>
+  </div>
+  <div id="vat-rate-box">
+    <label>Ставка НДС, %</label>
+    <div class="seg" id="seg-vatrate">
+      <button data-v="5" onclick="setVatRate(5)">5% (до ~272 млн)</button>
+      <button data-v="7" onclick="setVatRate(7)">7% (до ~490 млн)</button>
+      <button data-v="22" onclick="setVatRate(22)">22% общая</button>
+    </div>
+  </div>
+</div></details>
 
-<!-- ============ СПРАВОЧНИК ============ -->
-<div class="page" id="page-flowers">
-  <div class="card">
-    <h2>ДОБАВИТЬ ЦВЕТОК</h2>
-    <label>Название</label>
-    <input id="f-name" placeholder="Роза Эквадор 60 см">
+<details class="glass"><summary>🚚 Доставка от базы до салона</summary><div class="body inner">
+  <div class="seg" id="seg-delivery">
+    <button data-v="free" onclick="setSeg('delivery_mode','free')">Бесплатная</button>
+    <button data-v="paid" onclick="setSeg('delivery_mode','paid')">Платная</button>
+    <button data-v="driver" onclick="setSeg('delivery_mode','driver')">Свой водитель</button>
+  </div>
+  <div id="delivery-paid" style="display:none">
     <div class="row">
-      <div>
-        <label>Закупка за стебель, ₽</label>
-        <input id="f-price" type="number" min="0" placeholder="130">
-      </div>
-      <div>
-        <label>Упаковка, ₽</label>
-        <input id="f-pack" type="number" min="0" placeholder="0">
-      </div>
+      <div><label>Стоимость рейса, ₽</label><input id="s-delivery_trip" type="number" oninput="setNum('delivery_trip',this.value)"></div>
+      <div><label>Стеблей в поставке</label><input id="s-stems_per_trip" type="number" oninput="setNum('stems_per_trip',this.value)"></div>
     </div>
-    <button class="primary" onclick="addFlower()">＋ Добавить</button>
+    <div class="hint">Стоимость рейса размажется на каждый стебель поставки.</div>
   </div>
-  <div class="card">
-    <h2>МОЙ СПРАВОЧНИК</h2>
-    <div id="flower-list"></div>
+  <div id="delivery-driver" style="display:none">
+    <label>Оклад водителя, ₽/мес</label>
+    <input id="s-driver_salary" type="number" oninput="setNum('driver_salary',this.value)">
+    <div class="hint">Оклад добавится к постоянным расходам и размажется на все букеты месяца.</div>
   </div>
-</div>
+</div></details>
 
-<!-- ============ НАСТРОЙКИ ============ -->
-<div class="page" id="page-settings">
-  <div class="card">
-    <h2>НАЛОГИ</h2>
-    <label>Объект УСН</label>
-    <div class="seg" id="seg-tax">
-      <button data-v="usn6" onclick="setSeg('tax_mode','usn6')">Доходы 6%</button>
-      <button data-v="usn15" onclick="setSeg('tax_mode','usn15')">Дох.−расх. 15%</button>
-    </div>
-    <div class="row">
-      <div><label>НДС, %</label><input id="s-vat_rate" type="number" step="0.1" oninput="setNum('vat_rate',this.value)"></div>
-      <div><label>Эквайринг, %</label><input id="s-acquiring_pct" type="number" step="0.1" oninput="setNum('acquiring_pct',this.value)"></div>
-    </div>
-    <label>Комиссия маркетплейса, %</label>
-    <input id="s-marketplace_pct" type="number" step="0.1" oninput="setNum('marketplace_pct',this.value)">
+<details class="glass"><summary>🏠 Расходы и маржа</summary><div class="body inner">
+  <div class="row">
+    <div><label>Аренда + коммуналка, ₽/мес</label><input id="s-fixed_monthly" type="number" oninput="setNum('fixed_monthly',this.value)"></div>
+    <div><label>План продаж, букетов/мес</label><input id="s-planned_bouquets" type="number" oninput="setNum('planned_bouquets',this.value)"></div>
   </div>
+  <div class="row">
+    <div><label>Стеблей в букете в среднем</label><input id="s-avg_stems" type="number" oninput="setNum('avg_stems',this.value)"></div>
+    <div><label>Убыль/списания, %</label><input id="s-waste_pct" type="number" step="0.5" oninput="setNum('waste_pct',this.value)"></div>
+  </div>
+  <div class="row">
+    <div><label>Эквайринг, %</label><input id="s-acquiring_pct" type="number" step="0.1" oninput="setNum('acquiring_pct',this.value)"></div>
+    <div><label>Маркетплейс, %</label><input id="s-marketplace_pct" type="number" step="0.1" oninput="setNum('marketplace_pct',this.value)"></div>
+  </div>
+  <label>Оплата флориста</label>
+  <div class="seg" id="seg-florist">
+    <button data-v="percent" onclick="setSeg('florist_mode','percent')">% от цены</button>
+    <button data-v="fixed" onclick="setSeg('florist_mode','fixed')">фикс ₽/букет</button>
+  </div>
+  <div class="row">
+    <div><label>Флорист, % от цены</label><input id="s-florist_pct" type="number" step="0.1" oninput="setNum('florist_pct',this.value)"></div>
+    <div><label>или фикс, ₽/букет</label><input id="s-florist_fixed" type="number" oninput="setNum('florist_fixed',this.value)"></div>
+  </div>
+  <label>Целевая чистая маржа, % от цены</label>
+  <input id="s-target_margin_pct" type="number" step="0.5" oninput="setNum('target_margin_pct',this.value)">
+</div></details>
 
-  <div class="card">
-    <h2>СЕБЕСТОИМОСТЬ</h2>
-    <div class="row">
-      <div><label>Логистика, %</label><input id="s-logistics_pct" type="number" step="0.1" oninput="setNum('logistics_pct',this.value)"></div>
-      <div><label>Убыль/списания, %</label><input id="s-waste_pct" type="number" step="0.1" oninput="setNum('waste_pct',this.value)"></div>
-    </div>
-    <label>Оплата флориста</label>
-    <div class="seg" id="seg-florist">
-      <button data-v="percent" onclick="setSeg('florist_mode','percent')">% от цены</button>
-      <button data-v="fixed" onclick="setSeg('florist_mode','fixed')">фикс ₽</button>
-    </div>
-    <div class="row">
-      <div><label>Флорист, % от цены</label><input id="s-florist_pct" type="number" step="0.1" oninput="setNum('florist_pct',this.value)"></div>
-      <div><label>или фикс, ₽/букет</label><input id="s-florist_fixed" type="number" oninput="setNum('florist_fixed',this.value)"></div>
-    </div>
+<details class="glass"><summary>🎀 Упаковка</summary><div class="body inner">
+  <label>Упаковка входит в цену стебля?</label>
+  <div class="seg" id="seg-pack">
+    <button data-v="yes" onclick="setPackIn(true)">Да, входит</button>
+    <button data-v="no" onclick="setPackIn(false)">Нет, отдельно</button>
   </div>
+  <div id="pack-box">
+    <label>Упаковка на стебель, ₽</label>
+    <input id="s-pack_per_stem" type="number" oninput="setNum('pack_per_stem',this.value)">
+  </div>
+  <div class="hint">«Входит» — например, крафт на каждую розу в витрине. «Отдельно» — упаковка считается только на букет целиком.</div>
+</div></details>
 
-  <div class="card">
-    <h2>ПОСТОЯННЫЕ И МАРЖА</h2>
-    <div class="row">
-      <div><label>Аренда+прочее, ₽/мес</label><input id="s-fixed_monthly" type="number" oninput="setNum('fixed_monthly',this.value)"></div>
-      <div><label>План, букетов/мес</label><input id="s-planned_bouquets" type="number" oninput="setNum('planned_bouquets',this.value)"></div>
-    </div>
-    <label>Целевая чистая маржа, %</label>
-    <input id="s-target_margin_pct" type="number" step="0.5" oninput="setNum('target_margin_pct',this.value)">
-    <div class="hint">Все настройки хранятся на этом устройстве и применяются к расчёту мгновенно.</div>
+<details class="glass"><summary>📊 Коэффициенты наценки по планам</summary><div class="body inner">
+  <div class="tier-grid">
+    <div><label>1-й план, ×</label><input id="s-k_t1" type="number" step="0.1" oninput="setNum('k_t1',this.value)"></div>
+    <div><label>2-й план, ×</label><input id="s-k_t2" type="number" step="0.1" oninput="setNum('k_t2',this.value)"></div>
+    <div><label>Детали, ×</label><input id="s-k_detail" type="number" step="0.1" oninput="setNum('k_detail',this.value)"></div>
+    <div><label>Зелень, ×</label><input id="s-k_green" type="number" step="0.1" oninput="setNum('k_green',this.value)"></div>
   </div>
-</div>
+  <div class="hint">Цена стебля = максимум из двух расчётов: «себестоимость + налоги + маржа» и «закупка × коэффициент плана». Так вы не уйдёте ниже рынка и не ниже себестоимости. Ориентиры отрасли: массовые цветы ×2–2,5, экзотика и детали ×3–5.</div>
+</div></details>
+
+<!-- ================= СПРАВОЧНИК ================= -->
+<details class="glass"><summary>🌿 Справочник цветов и планов</summary><div class="body inner">
+  <div id="dict-list"></div>
+  <div class="hint">Справочник встроенный: начните вводить название в расчёте стебля — план определится автоматически. Неизвестный цветок можно отнести к плану вручную — приложение запомнит ваш выбор.</div>
+</div></details>
 
 <script>
-// ================== движок (порт pricing.py) ==================
-const DEFAULTS = {
-  tax_mode: "usn6", vat_rate: 5, acquiring_pct: 2, marketplace_pct: 0,
-  waste_pct: 15, logistics_pct: 10, florist_mode: "percent",
-  florist_pct: 10, florist_fixed: 150,
-  fixed_monthly: 150000, planned_bouquets: 500, target_margin_pct: 25
+/* ================================================================
+   СПРАВОЧНИК ЦВЕТОВ ПО ПЛАНАМ (база оптовых поставок, без сортов)
+   t1 — первый план (главные акценты), t2 — второй план (дополняют),
+   detail — мелкие акценты, green — зелень и объём
+================================================================ */
+const FLOWER_DB = {
+  // первый план — крупные статные
+  "Роза": "t1", "Пион": "t1", "Гортензия": "t1", "Георгин": "t1",
+  "Калла": "t1", "Лилия": "t1", "Гладиолус": "t1", "Амариллис": "t1",
+  "Протея": "t1", "Антуриум": "t1", "Подсолнух": "t1", "Ранункулюс": "t1",
+  "Орхидея Фаленопсис": "t1", "Орхидея Цимбидиум": "t1", "Орхидея Ванда": "t1",
+  "Сирень": "t1",
+  // второй план — средние, дополняющие
+  "Роза кустовая": "t2", "Гвоздика": "t2", "Гвоздика кустовая": "t2",
+  "Эустома": "t2", "Лизиантус": "t2", "Хризантема одноголовая": "t2",
+  "Хризантема кустовая": "t2", "Гербера": "t2", "Альстромерия": "t2",
+  "Фрезия": "t2", "Тюльпан": "t2", "Нарцисс": "t2", "Ирис": "t2",
+  "Анемон": "t2", "Маттиола": "t2", "Дельфиниум": "t2", "Лиатрис": "t2",
+  "Лаванда": "t2", "Вероника": "t2", "Астильба": "t2", "Астра": "t2",
+  "Кампанула": "t2", "Скабиоза": "t2", "Гиацинт": "t2", "Лупин": "t2",
+  "Вибурнум": "t2", "Клематис": "t2", "Алиум": "t2", "Трителея": "t2",
+  // детали — мелкие акценты
+  "Гипсофила": "detail", "Хамелациум": "detail", "Восковница": "detail",
+  "Краспедия": "detail", "Бруния": "detail", "Оксипеталум": "detail",
+  "Танацетум": "detail", "Хлопок": "detail", "Лагурус": "detail",
+  "Гомфрена": "detail", "Статица": "detail", "Лимониум": "detail",
+  "Астранция": "detail", "Мимоза": "detail", "Лотос сухой": "detail",
+  "Нигелла": "detail", "Диантус зелёный": "detail", "Сухоцветы микс": "detail",
+  // зелень — разбавка и объём
+  "Эвкалипт": "green", "Эвкалипт Цинерея": "green", "Эвкалипт Популюс": "green",
+  "Эвкалипт Парвифолия": "green", "Фисташка": "green", "Салал": "green",
+  "Рускус": "green", "Рускус Итальянский": "green", "Аспарагус": "green",
+  "Аспарагус Плюмозус": "green", "Папоротник": "green", "Берграс": "green",
+  "Питтоспорум": "green", "Монстера": "green", "Аспидистра": "green",
+  "Филодендрон": "green", "Пальма лист": "green", "Розмарин": "green",
+  "Магнолия лист": "green", "Олеандр": "green"
 };
 
-let S = load("fpc_settings", {...DEFAULTS});
-let flowers = load("fpc_flowers", []);      // [{name, price, pack}]
-let bouquet = load("fpc_bouquet", {});      // {name: qty}
+const TIER_NAMES = { t1: "1-й план · главный акцент", t2: "2-й план · дополняет",
+                     detail: "Деталь · мелкий акцент", green: "Зелень · объём" };
 
-function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }
+/* ================================================================
+   НАСТРОЙКИ (дефолты + localStorage)
+================================================================ */
+const DEFAULTS = {
+  tax_mode: "usn6", vat_on: true, vat_rate: 5,
+  delivery_mode: "paid", delivery_trip: 1500, stems_per_trip: 300, driver_salary: 45000,
+  fixed_monthly: 150000, planned_bouquets: 500, avg_stems: 12,
+  waste_pct: 15, acquiring_pct: 2, marketplace_pct: 0,
+  florist_mode: "percent", florist_pct: 10, florist_fixed: 150,
+  target_margin_pct: 25,
+  pack_in_stem: false, pack_per_stem: 5,
+  k_t1: 2.2, k_t2: 2.7, k_detail: 3.5, k_green: 3.2
+};
+
+let S = load("fpc2_settings", {...DEFAULTS});
+let customTiers = load("fpc2_custom_tiers", {});   // {"Название": "t1"}
+let bouquet = load("fpc2_bouquet", []);            // [{name, tier, purchase, qty}]
+
+function load(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }
 function save() {
-  localStorage.setItem("fpc_settings", JSON.stringify(S));
-  localStorage.setItem("fpc_flowers", JSON.stringify(flowers));
-  localStorage.setItem("fpc_bouquet", JSON.stringify(bouquet));
+  localStorage.setItem("fpc2_settings", JSON.stringify(S));
+  localStorage.setItem("fpc2_custom_tiers", JSON.stringify(customTiers));
+  localStorage.setItem("fpc2_bouquet", JSON.stringify(bouquet));
 }
-
 const fmt = n => Math.round(n).toLocaleString("ru-RU") + " ₽";
 
-function itemCost(f, qty) {
-  let stem = f.price * (1 + S.logistics_pct / 100);
-  stem = stem / (1 - S.waste_pct / 100);
-  return stem * qty + (f.pack || 0) * qty;
+/* ================================================================
+   ДВИЖОК
+================================================================ */
+function deliveryPerStem() {
+  if (S.delivery_mode === "paid")
+    return (+S.delivery_trip || 0) / Math.max(+S.stems_per_trip || 1, 1);
+  return 0; // free — 0; driver — уходит в постоянные
+}
+function fixedPerStem() {
+  const fixed = (+S.fixed_monthly || 0) + (S.delivery_mode === "driver" ? +S.driver_salary || 0 : 0);
+  return fixed / Math.max((+S.planned_bouquets || 1) * (+S.avg_stems || 1), 1);
+}
+function floristFixedPerStem() {
+  return S.florist_mode === "fixed" ? (+S.florist_fixed || 0) / Math.max(+S.avg_stems || 1, 1) : 0;
+}
+
+// Полная себестоимость стебля с разбивкой
+function stemCost(purchase) {
+  const delivery = deliveryPerStem();
+  const landed = purchase + delivery;
+  const withWaste = landed / (1 - S.waste_pct / 100);
+  const pack = S.pack_in_stem ? +S.pack_per_stem || 0 : 0;
+  const fixed = fixedPerStem();
+  const floristFix = floristFixedPerStem();
+  return { delivery, landed, withWaste, pack, fixed, floristFix,
+           C: withWaste + pack + fixed + floristFix };
 }
 
 function prettyPrice(p) {
@@ -248,13 +414,10 @@ function prettyPrice(p) {
   return base + 290;
 }
 
-function calc(items, extraPack, mode) {
-  const cogs = items.reduce((a, [f, q]) => a + itemCost(f, q), 0);
-  const fixedPer = S.fixed_monthly / Math.max(S.planned_bouquets, 1);
-  const floristFix = S.florist_mode === "fixed" ? +S.florist_fixed : 0;
-  const C = cogs + extraPack + fixedPer + floristFix;
-
-  const v = S.vat_rate / 100;
+// Цена стебля: максимум(формула с налогами и маржой, закупка×коэффициент плана)
+function stemPrice(purchase, tier, mode) {
+  const c = stemCost(purchase);
+  const v = S.vat_on ? S.vat_rate / 100 : 0;
   const netShare = 1 / (1 + v);
   let varPct = (S.acquiring_pct + S.marketplace_pct) / 100;
   if (S.florist_mode === "percent") varPct += S.florist_pct / 100;
@@ -263,153 +426,237 @@ function calc(items, extraPack, mode) {
   const denom = mode === "usn6"
     ? netShare * (1 - 0.06) - varPct - m
     : 0.85 * (netShare - varPct) - m;
-  if (denom <= 0.05 || C <= 0) return null;
+  const pFormula = denom > 0.05 ? c.C / denom : Infinity;
 
-  const price = prettyPrice(C / denom);
+  const k = S["k_" + tier] || 2.5;
+  const pCoeff = c.withWaste * k;
+
+  const price = prettyPrice(Math.max(pFormula, pCoeff));
+  const pathUsed = pFormula >= pCoeff ? "formula" : "coeff";
+
+  // разбивка итоговой цены стебля
   const vat = price * v / (1 + v);
   const rev = price - vat;
   const acq = price * (S.acquiring_pct + S.marketplace_pct) / 100;
   const flVar = S.florist_mode === "percent" ? price * S.florist_pct / 100 : 0;
-
   let tax, profit;
-  if (mode === "usn6") {
-    tax = rev * 0.06;
-    profit = rev - tax - acq - flVar - C;
+  if (mode === "usn6") { tax = rev * 0.06; profit = rev - tax - acq - flVar - c.C; }
+  else { const b = Math.max(rev - acq - flVar - c.C, 0); tax = b * 0.15; profit = b - tax; }
+
+  return { price, pathUsed, k, cost: c, vat, tax, acq, flVar, profit,
+           markup: purchase > 0 ? price / purchase : 0 };
+}
+
+/* ================================================================
+   UI: РАСЧЁТ СТЕБЛЯ
+================================================================ */
+let currentTier = null, currentResult = null;
+
+function detectTier(name) {
+  const n = name.trim().toLowerCase();
+  if (!n) return null;
+  const all = { ...FLOWER_DB, ...customTiers };
+  for (const [k, t] of Object.entries(all)) if (k.toLowerCase() === n) return t;
+  for (const [k, t] of Object.entries(all))
+    if (n.includes(k.toLowerCase()) || k.toLowerCase().includes(n)) return t;
+  return undefined; // неизвестный
+}
+
+function onNameInput() {
+  const name = document.getElementById("stem-name").value;
+  const tier = detectTier(name);
+  const chip = document.getElementById("tier-chip");
+  const pick = document.getElementById("tier-pick");
+  if (tier === null) { chip.innerHTML = ""; pick.style.display = "none"; currentTier = null; }
+  else if (tier === undefined) {
+    chip.innerHTML = `<span class="chip detail">новый цветок — выберите план ниже</span>`;
+    pick.style.display = "block";
+    currentTier = null;
   } else {
-    const b = Math.max(rev - acq - flVar - C, 0);
-    tax = b * 0.15;
-    profit = b - tax;
+    chip.innerHTML = `<span class="chip ${tier}">${TIER_NAMES[tier]}</span>`;
+    pick.style.display = "none";
+    currentTier = tier;
   }
-  const raw = items.reduce((a, [f, q]) => a + f.price * q, 0);
-  return { price, C, cogs, extraPack, fixedPer, floristFix, flVar, vat, tax, acq, profit,
-           markup: raw > 0 ? price / raw : 0 };
+  recalcStem();
 }
 
-// ================== UI ==================
-function showPage(p) {
-  document.querySelectorAll(".page").forEach(e => e.classList.remove("active"));
-  document.querySelectorAll(".tabs button").forEach(e => e.classList.remove("active"));
-  document.getElementById("page-" + p).classList.add("active");
-  document.getElementById("tab-" + p).classList.add("active");
-  if (p === "calc") renderCalc();
-  if (p === "flowers") renderFlowers();
+function manualTier(t) {
+  const name = document.getElementById("stem-name").value.trim();
+  if (name) { customTiers[name] = t; save(); }
+  currentTier = t;
+  document.querySelectorAll("#seg-tier-manual button").forEach(b =>
+    b.classList.toggle("on", b.dataset.v === t));
+  document.getElementById("tier-chip").innerHTML =
+    `<span class="chip ${t}">${TIER_NAMES[t]} · запомнил</span>`;
+  recalcStem();
 }
 
-function bouquetItems() {
-  return flowers.filter(f => bouquet[f.name] > 0).map(f => [f, bouquet[f.name]]);
+function recalcStem() {
+  const box = document.getElementById("stem-result");
+  const btn = document.getElementById("btn-add");
+  const purchase = +document.getElementById("stem-price").value;
+  if (!currentTier || !(purchase > 0)) { box.innerHTML = ""; btn.style.display = "none"; currentResult = null; return; }
+
+  const r = stemPrice(purchase, currentTier, S.tax_mode);
+  currentResult = r;
+  btn.style.display = "block";
+  const pathTxt = r.pathUsed === "formula"
+    ? "по формуле себестоимости + налоги + маржа"
+    : `по коэффициенту плана ×${r.k}`;
+  box.innerHTML = `
+    <div class="glass" style="margin:12px 0 0"><div class="inner">
+      <div class="break">
+        <div class="l"><span>💰 <b>Цена продажи стебля</b></span><b style="font-size:19px;color:var(--green-deep)">${fmt(r.price)}</b></div>
+        <div class="l"><span>наценка на закупку</span><b>×${r.markup.toFixed(1)}</b></div>
+        <div class="l"><span>путь расчёта</span><b>${pathTxt}</b></div>
+        <div class="l"><span>себестоимость стебля</span><b>${fmt(r.cost.C)}</b></div>
+        <div class="l"><span>· доставка до салона</span><b>${fmt(r.cost.delivery)}</b></div>
+        <div class="l"><span>· довес на убыль ${S.waste_pct}%</span><b>${fmt(r.cost.withWaste - r.cost.landed)}</b></div>
+        <div class="l"><span>· упаковка стебля</span><b>${fmt(r.cost.pack)}</b></div>
+        <div class="l"><span>· аренда и постоянные</span><b>${fmt(r.cost.fixed)}</b></div>
+        <div class="l"><span>НДС в цене</span><b>${fmt(r.vat)}</b></div>
+        <div class="l"><span>УСН в цене</span><b>${fmt(r.tax)}</b></div>
+        <div class="l"><span>Эквайринг/комиссии</span><b>${fmt(r.acq)}</b></div>
+        <div class="l profit"><span>Прибыль со стебля</span><b>${fmt(r.profit)}</b></div>
+      </div>
+    </div></div>`;
 }
 
-function recalc() {
-  const items = bouquetItems();
-  const extra = +document.getElementById("extra-pack").value || 0;
+/* ================================================================
+   UI: БУКЕТ
+================================================================ */
+function addToBouquet() {
+  const name = document.getElementById("stem-name").value.trim();
+  const purchase = +document.getElementById("stem-price").value;
+  const qty = Math.max(1, +document.getElementById("stem-qty").value || 1);
+  if (!name || !currentTier || !(purchase > 0)) return;
+  const ex = bouquet.find(b => b.name === name && b.purchase === purchase);
+  if (ex) ex.qty += qty; else bouquet.push({ name, tier: currentTier, purchase, qty });
+  save(); renderBouquet();
+}
+
+function chgQty(i, d) {
+  bouquet[i].qty += d;
+  if (bouquet[i].qty <= 0) bouquet.splice(i, 1);
+  save(); renderBouquet();
+}
+function delItem(i) { bouquet.splice(i, 1); save(); renderBouquet(); }
+
+function renderBouquet() {
+  const box = document.getElementById("bouquet-list");
+  box.innerHTML = bouquet.length ? bouquet.map((b, i) => {
+    const r = stemPrice(b.purchase, b.tier, S.tax_mode);
+    return `<div class="line-item">
+      <div class="nm">${b.name}<small>${TIER_NAMES[b.tier]} · закупка ${fmt(b.purchase)} · цена ${fmt(r.price)}</small></div>
+      <div class="qty">
+        <button onclick="chgQty(${i},-1)">−</button><b>${b.qty}</b><button onclick="chgQty(${i},1)">＋</button>
+      </div>
+      <button class="del" onclick="delItem(${i})">🗑</button>
+    </div>`;
+  }).join("") : `<div class="hint">Пока пусто — рассчитайте стебель выше и добавьте его в букет.</div>`;
+  recalcBouquet();
+}
+
+function recalcBouquet() {
   const hero = document.getElementById("hero-price");
   const sub = document.getElementById("hero-sub");
-  const alt = document.getElementById("alt-price");
+  const alt = document.getElementById("hero-alt");
   const br = document.getElementById("breakdown");
-
-  const r = calc(items, extra, S.tax_mode);
-  if (!r) {
-    hero.textContent = "0 ₽";
-    sub.textContent = items.length ? "проверьте параметры расчёта" : "добавьте цветы в букет";
-    alt.textContent = ""; br.innerHTML = "";
-    return;
+  if (!bouquet.length) {
+    hero.textContent = "0 ₽"; sub.textContent = "соберите букет из стеблей выше";
+    alt.textContent = ""; br.innerHTML = ""; return;
   }
-  hero.textContent = fmt(r.price);
-  sub.textContent = `себестоимость ${fmt(r.C)} · прибыль ${fmt(r.profit)} · наценка ×${r.markup.toFixed(1)}`;
-
-  const other = calc(items, extra, S.tax_mode === "usn6" ? "usn15" : "usn6");
-  if (other) alt.textContent = (S.tax_mode === "usn6"
-    ? `При УСН «Доходы−расходы» 15%: ${fmt(other.price)}`
-    : `При УСН «Доходы» 6%: ${fmt(other.price)}`);
-
-  const lines = [
-    ["Закупка + логистика + убыль", r.cogs],
-    ["Упаковка", r.extraPack],
-    ["Аренда на 1 букет", r.fixedPer],
-  ];
-  if (r.floristFix) lines.push(["Флорист (фикс)", r.floristFix]);
-  if (r.flVar) lines.push(["Флорист (% от цены)", r.flVar]);
-  lines.push(["НДС " + S.vat_rate + "%", r.vat]);
-  lines.push([S.tax_mode === "usn6" ? "УСН 6% с дохода" : "УСН 15% с прибыли", r.tax]);
-  lines.push(["Эквайринг/комиссии", r.acq]);
-  br.innerHTML = lines.map(([l, v]) => `<div class="line"><span>${l}</span><b>${fmt(v)}</b></div>`).join("")
-    + `<div class="line profit"><span>Чистая прибыль</span><b>${fmt(r.profit)}</b></div>`;
-}
-
-function renderCalc() {
-  const box = document.getElementById("calc-flowers");
-  if (!flowers.length) {
-    box.innerHTML = `<div class="hint">Справочник пуст — добавьте цветы во вкладке «Цветы».</div>`;
-  } else {
-    box.innerHTML = flowers.map(f => `
-      <div class="flower-line">
-        <div class="nm">${f.name}<small>${fmt(f.price)} / стебель</small></div>
-        <div class="qty">
-          <button onclick="chgQty('${esc(f.name)}',-1)">−</button>
-          <b>${bouquet[f.name] || 0}</b>
-          <button onclick="chgQty('${esc(f.name)}',1)">＋</button>
-        </div>
-      </div>`).join("");
+  let total = 0, cost = 0, profit = 0, vat = 0, tax = 0, acq = 0, fl = 0;
+  const parts = [];
+  for (const b of bouquet) {
+    const r = stemPrice(b.purchase, b.tier, S.tax_mode);
+    total += r.price * b.qty;
+    cost += r.cost.C * b.qty;
+    profit += r.profit * b.qty;
+    vat += r.vat * b.qty; tax += r.tax * b.qty;
+    acq += r.acq * b.qty; fl += (r.flVar + r.cost.floristFix) * b.qty;
+    parts.push([`${b.name} × ${b.qty}`, r.price * b.qty]);
   }
-  recalc();
+  const pack = +document.getElementById("extra-pack").value || 0;
+  const finalPrice = prettyPrice(total + pack);
+
+  hero.textContent = fmt(finalPrice);
+  sub.textContent = `себестоимость ${fmt(cost + pack)} · прибыль ≈ ${fmt(profit)} · маржа ${(profit / finalPrice * 100).toFixed(0)}%`;
+
+  // сравнение режимов УСН
+  let otherTotal = 0;
+  const otherMode = S.tax_mode === "usn6" ? "usn15" : "usn6";
+  for (const b of bouquet) otherTotal += stemPrice(b.purchase, b.tier, otherMode).price * b.qty;
+  alt.textContent = S.tax_mode === "usn6"
+    ? `Если бы УСН «Доходы−расходы» 15%: ≈ ${fmt(prettyPrice(otherTotal + pack))}`
+    : `Если бы УСН «Доходы» 6%: ≈ ${fmt(prettyPrice(otherTotal + pack))}`;
+
+  br.innerHTML = parts.map(([l, v]) => `<div class="l"><span>${l}</span><b>${fmt(v)}</b></div>`).join("")
+    + `<div class="l"><span>Упаковка букета</span><b>${fmt(pack)}</b></div>`
+    + `<div class="l"><span>— в т.ч. НДС</span><b>${fmt(vat)}</b></div>`
+    + `<div class="l"><span>— в т.ч. УСН</span><b>${fmt(tax)}</b></div>`
+    + `<div class="l"><span>— в т.ч. работа флориста</span><b>${fmt(fl)}</b></div>`
+    + `<div class="l"><span>— в т.ч. эквайринг/комиссии</span><b>${fmt(acq)}</b></div>`
+    + `<div class="l profit"><span>Чистая прибыль</span><b>${fmt(profit)}</b></div>`;
 }
 
-function renderFlowers() {
-  const box = document.getElementById("flower-list");
-  box.innerHTML = flowers.length ? flowers.map(f => `
-    <div class="flower-line">
-      <div class="nm">${f.name}<small>закупка ${fmt(f.price)}${f.pack ? " + упак. " + fmt(f.pack) : ""}</small></div>
-      <button class="del" onclick="delFlower('${esc(f.name)}')">🗑</button>
-    </div>`).join("")
-    : `<div class="hint">Пока пусто.</div>`;
-}
+/* ================================================================
+   НАСТРОЙКИ UI
+================================================================ */
+function setNum(k, v) { S[k] = +v || 0; save(); recalcStem(); renderBouquet(); }
+function setSeg(k, v) { S[k] = v; save(); syncUI(); recalcStem(); renderBouquet(); }
+function setVatOn(on) { S.vat_on = on; save(); syncUI(); recalcStem(); renderBouquet(); }
+function setVatRate(r) { S.vat_rate = r; S.vat_on = true; save(); syncUI(); recalcStem(); renderBouquet(); }
+function setPackIn(on) { S.pack_in_stem = on; save(); syncUI(); recalcStem(); renderBouquet(); }
 
-function esc(s) { return s.replace(/'/g, "\\'"); }
-
-function chgQty(name, d) {
-  bouquet[name] = Math.max(0, (bouquet[name] || 0) + d);
-  save(); renderCalc();
+function syncSeg(id, val) {
+  document.querySelectorAll("#" + id + " button").forEach(b =>
+    b.classList.toggle("on", b.dataset.v === String(val)));
 }
-function addFlower() {
-  const name = document.getElementById("f-name").value.trim();
-  const price = +document.getElementById("f-price").value;
-  const pack = +document.getElementById("f-pack").value || 0;
-  if (!name || !(price >= 0)) { alert("Введите название и закупочную цену"); return; }
-  const ex = flowers.find(f => f.name === name);
-  if (ex) { ex.price = price; ex.pack = pack; } else flowers.push({ name, price, pack });
-  document.getElementById("f-name").value = "";
-  document.getElementById("f-price").value = "";
-  document.getElementById("f-pack").value = "";
-  save(); renderFlowers();
-}
-function delFlower(name) {
-  flowers = flowers.filter(f => f.name !== name);
-  delete bouquet[name];
-  save(); renderFlowers();
-}
-
-function setNum(k, v) { S[k] = +v || 0; save(); recalc(); }
-function setSeg(k, v) {
-  S[k] = v; save(); syncSettingsUI(); recalc();
-}
-
-function syncSettingsUI() {
+function syncUI() {
   for (const k of Object.keys(DEFAULTS)) {
     const el = document.getElementById("s-" + k);
     if (el) el.value = S[k];
   }
-  for (const [id, k] of [["seg-tax", "tax_mode"], ["seg-florist", "florist_mode"]]) {
-    document.querySelectorAll("#" + id + " button").forEach(b =>
-      b.classList.toggle("on", b.dataset.v === S[k]));
-  }
+  syncSeg("seg-tax", S.tax_mode);
+  syncSeg("seg-vat", S.vat_on ? "on" : "off");
+  syncSeg("seg-vatrate", S.vat_rate);
+  syncSeg("seg-delivery", S.delivery_mode);
+  syncSeg("seg-florist", S.florist_mode);
+  syncSeg("seg-pack", S.pack_in_stem ? "yes" : "no");
+  document.getElementById("vat-rate-box").style.display = S.vat_on ? "block" : "none";
+  document.getElementById("delivery-paid").style.display = S.delivery_mode === "paid" ? "block" : "none";
+  document.getElementById("delivery-driver").style.display = S.delivery_mode === "driver" ? "block" : "none";
+  document.getElementById("pack-box").style.display = S.pack_in_stem ? "block" : "none";
 }
 
-// ================== Telegram WebApp ==================
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+/* ================================================================
+   СПРАВОЧНИК UI
+================================================================ */
+function renderDict() {
+  const all = { ...FLOWER_DB, ...customTiers };
+  const groups = { t1: [], t2: [], detail: [], green: [] };
+  for (const [n, t] of Object.entries(all)) groups[t].push(n);
+  const labels = { t1: "🌸 Первый план — главные акценты", t2: "🌷 Второй план — дополняют",
+                   detail: "✨ Детали — мелкие акценты", green: "🌿 Зелень и объём" };
+  document.getElementById("dict-list").innerHTML = Object.entries(groups).map(([t, names]) =>
+    names.length ? `<div style="margin-bottom:10px"><div class="chip ${t}" style="margin-bottom:6px">${labels[t]}</div>
+      <div style="font-size:13px;line-height:1.8">${names.sort().join(" · ")}</div></div>` : ""
+  ).join("");
+}
 
-syncSettingsUI();
-renderCalc();
+/* datalist для автоподсказок */
+function renderDatalist() {
+  const all = [...Object.keys(FLOWER_DB), ...Object.keys(customTiers)];
+  document.getElementById("flower-names").innerHTML =
+    all.sort().map(n => `<option value="${n}">`).join("");
+}
+
+/* ================================================================ */
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#f2faf4"); tg.setBackgroundColor("#f2faf4"); }
+
+syncUI(); renderDatalist(); renderDict(); renderBouquet();
 </script>
 </body>
 </html>
