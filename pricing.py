@@ -23,10 +23,15 @@ class Settings:
     acquiring_pct: float = 2.0        # эквайринг, % от цены
     marketplace_pct: float = 0.0      # комиссия маркетплейса/агрегатора, % от цены
     waste_pct: float = 15.0           # убыль/списания, % от закупки
-    logistics_pct: float = 10.0       # доставка от поставщика, % к закупке
-    florist_mode: str = "percent"     # percent | fixed
+    logistics_pct: float = 10.0       # доставка от поставщика, % к закупке (устар., см. delivery_*)
+    delivery_mode: str = "paid"       # free | paid | driver
+    delivery_trip: float = 1500.0     # стоимость рейса доставки, ₽
+    stems_per_trip: int = 300         # стеблей в одной поставке
+    driver_salary: float = 45000.0    # оклад водителя, ₽/мес (режим driver)
+    florist_mode: str = "salary"      # percent | fixed | salary
     florist_pct: float = 10.0         # работа флориста, % от цены
     florist_fixed: float = 150.0      # или фикс ₽ за букет
+    florist_salary: float = 60000.0   # или оклад ₽/мес
     fixed_monthly: float = 150000.0   # аренда + коммуналка + прочее, ₽/мес
     planned_bouquets: int = 500       # план продаж, букетов/мес
     target_margin_pct: float = 25.0   # целевая чистая маржа, % от цены
@@ -75,11 +80,23 @@ def raw_cogs(items: list) -> float:
 
 def full_cost(items: list, extra_packaging: float, s: Settings) -> dict:
     cogs = sum(_item_cost(i, s) for i in items)
-    fixed_per = s.fixed_monthly / max(int(s.planned_bouquets), 1)
+    # доставка от базы: платная — рейс делится на стебли поставки
+    stems = sum(i.qty for i in items)
+    delivery = 0.0
+    if getattr(s, "delivery_mode", "paid") == "paid":
+        delivery = float(s.delivery_trip) / max(int(s.stems_per_trip), 1) * stems
+    # постоянные: аренда + оклад водителя + оклад флориста
+    fixed_month = float(s.fixed_monthly)
+    if getattr(s, "delivery_mode", "paid") == "driver":
+        fixed_month += float(s.driver_salary)
+    if s.florist_mode == "salary":
+        fixed_month += float(getattr(s, "florist_salary", 60000.0))
+    fixed_per = fixed_month / max(int(s.planned_bouquets), 1)
     florist_fix = float(s.florist_fixed) if s.florist_mode == "fixed" else 0.0
-    total = cogs + extra_packaging + fixed_per + florist_fix
+    total = cogs + delivery + extra_packaging + fixed_per + florist_fix
     return {
         "cogs": cogs,
+        "delivery": delivery,
         "packaging": extra_packaging,
         "fixed_per": fixed_per,
         "florist_fixed": florist_fix,
@@ -129,8 +146,9 @@ def calc_price(items: list, extra_packaging: float, s: Settings, mode: str) -> P
 
     lines = [
         ("Закупка цветов + логистика + убыль", fc["cogs"]),
+        ("Доставка от базы", fc["delivery"]),
         ("Упаковка", fc["packaging"]),
-        ("Аренда и постоянные (на 1 букет)", fc["fixed_per"]),
+        ("Аренда, оклады и постоянные (на 1 букет)", fc["fixed_per"]),
     ]
     if fc["florist_fixed"]:
         lines.append(("Работа флориста (фикс)", fc["florist_fixed"]))

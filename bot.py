@@ -76,10 +76,14 @@ SETTING_FIELDS = {
     "acquiring_pct":    ("Эквайринг, % от цены", "num", None),
     "marketplace_pct":  ("Комиссия маркетплейса, % от цены", "num", None),
     "waste_pct":        ("Убыль/списания, % от закупки", "num", None),
-    "logistics_pct":    ("Логистика от поставщика, % к закупке", "num", None),
-    "florist_mode":     ("Оплата флориста", "choice", ["percent", "fixed"]),
+    "delivery_mode":    ("Доставка от базы", "choice", ["free", "paid", "driver"]),
+    "delivery_trip":    ("Стоимость рейса доставки, ₽", "num", None),
+    "stems_per_trip":   ("Стеблей в поставке", "int", None),
+    "driver_salary":    ("Оклад водителя, ₽/мес", "num", None),
+    "florist_mode":     ("Оплата флориста", "choice", ["percent", "fixed", "salary"]),
     "florist_pct":      ("Флорист, % от цены", "num", None),
     "florist_fixed":    ("Флорист, фикс ₽ за букет", "num", None),
+    "florist_salary":   ("Флорист, оклад ₽/мес", "num", None),
     "fixed_monthly":    ("Аренда + постоянные, ₽/мес", "num", None),
     "planned_bouquets": ("План продаж, букетов/мес", "int", None),
     "target_margin_pct":("Целевая чистая маржа, % от цены", "num", None),
@@ -90,6 +94,10 @@ CHOICE_LABELS = {
     "usn15": "УСН «Доходы−расходы» 15%",
     "percent": "% от цены букета",
     "fixed": "фикс ₽ за букет",
+    "salary": "оклад ₽/мес",
+    "free": "бесплатная",
+    "paid": "платная (за рейс)",
+    "driver": "свой водитель",
 }
 
 
