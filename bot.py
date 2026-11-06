@@ -41,9 +41,10 @@ BOT_TOKEN = os.environ["BOT_TOKEN"]
 WEBAPP_URL = os.environ.get("WEBAPP_URL", "").strip()
 db = DB(os.environ["SUPABASE_URL"], os.environ["SUPABASE_KEY"])
 
-# Принудительно IPv4 — через часть VPN-туннелей IPv6 до api.telegram.org виснет
-session = AiohttpSession()
-session._connector_init.update({"family": socket.AF_INET})
+# Если задан PROXY_URL (например socks5://127.0.0.1:10808 от VPN) — идём через него
+PROXY_URL = os.environ.get("PROXY_URL", "").strip()
+session = AiohttpSession(proxy=PROXY_URL) if PROXY_URL else AiohttpSession()
+session._connector_init.update({"family": socket.AF_INET})  # IPv4: через часть VPN IPv6 виснет
 bot = Bot(BOT_TOKEN, session=session)
 dp = Dispatcher(storage=MemoryStorage())
 
