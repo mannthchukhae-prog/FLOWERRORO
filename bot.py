@@ -13,8 +13,10 @@ Telegram-бот «Калькулятор цены букета» для цвет
 import asyncio
 import logging
 import os
+import socket
 
 from aiogram import Bot, Dispatcher, F
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -23,7 +25,9 @@ from aiogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    MenuButtonWebApp,
     Message,
+    WebAppInfo,
 )
 from dotenv import load_dotenv
 
@@ -34,9 +38,13 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
+WEBAPP_URL = os.environ.get("WEBAPP_URL", "").strip()
 db = DB(os.environ["SUPABASE_URL"], os.environ["SUPABASE_KEY"])
 
-bot = Bot(BOT_TOKEN)
+# Принудительно IPv4 — через часть VPN-туннелей IPv6 до api.telegram.org виснет
+session = AiohttpSession()
+session._connector_init.update({"family": socket.AF_INET})
+bot = Bot(BOT_TOKEN, session=session)
 dp = Dispatcher(storage=MemoryStorage())
 
 # ---------------------------------------------------------------- helpers
@@ -46,12 +54,19 @@ def fmt(n: float) -> str:
 
 
 def main_menu() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[
+    rows = []
+    if WEBAPP_URL:
+        rows.append([InlineKeyboardButton(
+            text="💐 Открыть калькулятор",
+            web_app=WebAppInfo(url=WEBAPP_URL),
+        )])
+    rows += [
         [InlineKeyboardButton(text="💐 Рассчитать букет", callback_data="price")],
         [InlineKeyboardButton(text="⚡ Быстрый расчёт", callback_data="quick")],
         [InlineKeyboardButton(text="🌸 Справочник цветов", callback_data="flowers")],
         [InlineKeyboardButton(text="⚙️ Настройки мастерской", callback_data="settings")],
-    ])
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 SETTING_FIELDS = {
@@ -153,12 +168,22 @@ class Quick(StatesGroup):
 async def cmd_start(m: Message, state: FSMContext):
     await state.clear()
     db.get_settings(m.chat.id)  # создаст запись с дефолтами при первом запуске
+    if WEBAPP_URL:
+        try:
+            await bot.set_chat_menu_button(
+                chat_id=m.chat.id,
+                menu_button=MenuButtonWebApp(text="💐 Калькулятор", web_app=WebAppInfo(url=WEBAPP_URL)),
+            )
+        except Exception:
+            logging.exception("Не удалось установить menu button")
     await m.answer(
         "🌷 <b>Калькулятор цены букета</b>\n\n"
         "Считаю продажную цену так, чтобы в ней уже сидели закупка, логистика, "
         "убыль, работа флориста, аренда, эквайринг, НДС 5% и налог УСН — "
         "а сверху оставалась ваша целевая маржа.\n\n"
-        "Сначала загляните в ⚙️ Настройки и заполните справочник цветов.",
+        + ("👇 Нажмите «💐 Открыть калькулятор» — приложение откроется прямо в Telegram.\n\n"
+           if WEBAPP_URL else "")
+        + "Команды ниже дублируют расчёт прямо в чате.",
         reply_markup=main_menu(),
     )
 
