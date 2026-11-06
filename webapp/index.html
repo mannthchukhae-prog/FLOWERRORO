@@ -53,10 +53,7 @@
   }
   .auth-links { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
   .auth-links a { color: var(--sky); text-decoration: none; font-weight: 600; cursor: pointer; }
-  .auth-error {
-    color: #c0392b; font-size: 13px; text-align: center;
-    margin-top: 10px; min-height: 18px;
-  }
+  .auth-error { color: #c0392b; font-size: 13px; text-align: center; margin-top: 10px; min-height: 18px; }
 
   /* ================= ОСНОВНОЙ ЭКРАН ================= */
   #app { display: none; padding: 0 14px 90px; }
@@ -108,35 +105,12 @@
   .chip.t1 { background: #faf0f4; color: #8f3a5e; border-color: #e8d3dd; }
   .chip.detail { background: #faf5ea; color: #8a6416; border-color: #eadfc2; }
 
-  button.primary {
-    width: 100%; padding: 12px; border: 0; border-radius: 4px;
-    background: var(--navy); color: #fff; font-size: 14px; font-weight: 700;
-    letter-spacing: .1em; text-transform: uppercase; margin-top: 12px; cursor: pointer;
+  .price-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0 12px; border-bottom: 2px solid var(--navy); margin-bottom: 6px;
   }
-
-  .hero {
-    padding: 18px 16px; border-radius: 6px; margin-bottom: 12px;
-    background: linear-gradient(160deg, var(--navy), var(--navy-deep)); color: #fff;
-  }
-  .hero .cap { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; opacity: .65; font-weight: 800; }
-  .hero .val { font-size: 38px; font-weight: 800; margin-top: 2px; }
-  .hero .sub { font-size: 12.5px; opacity: .85; margin-top: 4px; }
-  .hero .alt { font-size: 12px; opacity: .6; margin-top: 8px; }
-
-  .line-item {
-    display: flex; align-items: center; gap: 8px; padding: 9px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .line-item:last-child { border-bottom: 0; }
-  .line-item .nm { flex: 1; font-size: 14.5px; }
-  .line-item .nm small { display: block; color: var(--muted); font-size: 12px; }
-  .qty { display: flex; align-items: center; gap: 8px; }
-  .qty button {
-    width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--line);
-    background: #fff; color: var(--navy); font-size: 16px; font-weight: 700; cursor: pointer;
-  }
-  .qty b { min-width: 20px; text-align: center; font-size: 14.5px; }
-  .del { color: #b33; font-size: 14px; border: 0; background: none; cursor: pointer; padding: 4px; }
+  .price-head .cap { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--navy); font-weight: 800; }
+  .price-head .val { font-size: 30px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; }
 
   .break { font-size: 13.5px; }
   .break .l {
@@ -147,7 +121,6 @@
   .break .l span { color: var(--muted); }
   .break .l b { font-variant-numeric: tabular-nums; white-space: nowrap; }
   .break .l.profit span, .break .l.profit b { color: var(--navy); font-weight: 800; }
-  .break .l.head span { color: var(--ink); font-weight: 700; }
 
   details.card { padding: 0; overflow: hidden; }
   details.card summary {
@@ -178,10 +151,8 @@
       <path d="M50 48 C 50 34, 60 30, 65 30 C 65 42, 58 48, 50 48"/>
       <circle cx="50" cy="26" r="4"/>
     </svg>
-    <div>
-      <div class="title">Цветочный<br>калькулятор</div>
-    </div>
-    <div class="subtitle">цена стебля и букета с учётом всех расходов</div>
+    <div class="title">Цветочный<br>калькулятор</div>
+    <div class="subtitle">цена стебля с учётом всех расходов</div>
   </div>
   <div class="auth-body">
     <input id="auth-login" placeholder="Логин" autocomplete="username">
@@ -224,26 +195,6 @@
     <label>Закупочная цена стебля, ₽</label>
     <input id="stem-price" type="number" min="0" inputmode="decimal" placeholder="130" oninput="recalcStem()">
     <div id="stem-result"></div>
-    <button class="primary" id="btn-add" onclick="addToBouquet()" style="display:none">Добавить в букет</button>
-  </div>
-
-  <div class="hero">
-    <div class="cap">Цена букета</div>
-    <div class="val" id="hero-price">0 ₽</div>
-    <div class="sub" id="hero-sub">соберите букет из стеблей выше</div>
-    <div class="alt" id="hero-alt"></div>
-  </div>
-
-  <div class="card">
-    <h2>Состав букета</h2>
-    <div id="bouquet-list"></div>
-    <label>Общая упаковка букета (бумага, ленты, открытка), ₽</label>
-    <input id="extra-pack" type="number" min="0" value="150" oninput="recalcBouquet()">
-  </div>
-
-  <div class="card">
-    <h2>Что зашито в цену букета</h2>
-    <div class="break" id="breakdown"></div>
   </div>
 
   <details class="card"><summary>Налоги</summary><div class="body">
@@ -291,16 +242,11 @@
     <label>Оплата флориста</label>
     <div class="seg" id="seg-florist">
       <button data-v="percent" onclick="setSeg('florist_mode','percent')">% от цены</button>
-      <button data-v="fixed" onclick="setSeg('florist_mode','fixed')">Фикс/букет</button>
       <button data-v="salary" onclick="setSeg('florist_mode','salary')">Оклад</button>
     </div>
     <div id="florist-percent">
       <label>Флорист, % от цены</label>
       <input id="s-florist_pct" type="number" step="0.1" oninput="setNum('florist_pct',this.value)">
-    </div>
-    <div id="florist-fixed" style="display:none">
-      <label>Флорист, фикс ₽ за букет</label>
-      <input id="s-florist_fixed" type="number" oninput="setNum('florist_fixed',this.value)">
     </div>
     <div id="florist-salary" style="display:none">
       <label>Оклад флориста, ₽/мес</label>
@@ -308,18 +254,16 @@
     </div>
     <div class="row">
       <div><label>Аренда + коммуналка, ₽/мес</label><input id="s-fixed_monthly" type="number" oninput="setNum('fixed_monthly',this.value)"></div>
-      <div><label>План продаж, букетов/мес</label><input id="s-planned_bouquets" type="number" oninput="setNum('planned_bouquets',this.value)"></div>
+      <div><label>Продажи, стеблей/мес</label><input id="s-stems_monthly" type="number" oninput="setNum('stems_monthly',this.value)"></div>
     </div>
     <div class="row">
-      <div><label>Стеблей в букете в среднем</label><input id="s-avg_stems" type="number" oninput="setNum('avg_stems',this.value)"></div>
       <div><label>Убыль/списания, %</label><input id="s-waste_pct" type="number" step="0.5" oninput="setNum('waste_pct',this.value)"></div>
+      <div><label>Эквайринг, %</label><input id="s-acquiring_pct" type="number" step="0.1" oninput="setNum('acquiring_pct',this.value)"></div>
     </div>
     <div class="row">
-      <div><label>Эквайринг, %</label><input id="s-acquiring_pct" type="number" step="0.1" oninput="setNum('acquiring_pct',this.value)"></div>
       <div><label>Маркетплейс, %</label><input id="s-marketplace_pct" type="number" step="0.1" oninput="setNum('marketplace_pct',this.value)"></div>
+      <div><label>Целевая маржа, %</label><input id="s-target_margin_pct" type="number" step="0.5" oninput="setNum('target_margin_pct',this.value)"></div>
     </div>
-    <label>Целевая чистая маржа, % от цены</label>
-    <input id="s-target_margin_pct" type="number" step="0.5" oninput="setNum('target_margin_pct',this.value)">
   </div></details>
 
   <details class="card"><summary>Упаковка</summary><div class="body">
@@ -332,7 +276,7 @@
       <label>Упаковка на стебель, ₽</label>
       <input id="s-pack_per_stem" type="number" oninput="setNum('pack_per_stem',this.value)">
     </div>
-    <div class="hint">«Входит» — плёнка на каждую розу в витрине. «Отдельно» — упаковка только на букет целиком.</div>
+    <div class="hint">«Входит» — плёнка на каждую розу в витрине. «Отдельно» — упаковка в цену стебля не входит.</div>
   </div></details>
 
   <details class="card"><summary>Коэффициенты наценки по планам</summary><div class="body">
@@ -414,8 +358,8 @@ const TIER_NAMES = { t1: "1-й план · главный акцент", t2: "2-
 const DEFAULTS = {
   tax_mode: "usn6", vat_on: true, vat_rate: 5,
   delivery_mode: "paid", delivery_trip: 1500, stems_per_trip: 300, driver_salary: 45000,
-  florist_mode: "salary", florist_pct: 10, florist_fixed: 150, florist_salary: 60000,
-  fixed_monthly: 150000, planned_bouquets: 500, avg_stems: 12,
+  florist_mode: "salary", florist_pct: 10, florist_salary: 60000,
+  fixed_monthly: 150000, stems_monthly: 6000,
   waste_pct: 15, acquiring_pct: 2, marketplace_pct: 0,
   target_margin_pct: 25,
   pack_in_stem: false, pack_per_stem: 5,
@@ -424,7 +368,6 @@ const DEFAULTS = {
 
 let S = {...DEFAULTS};
 let customTiers = {};
-let bouquet = [];
 let session = null;               // {login, pass}
 let saveTimer = null;
 
@@ -435,7 +378,6 @@ function persistLocal() {
   const p = "fpc3_" + session.login + "_";
   localStorage.setItem(p + "settings", JSON.stringify(S));
   localStorage.setItem(p + "customTiers", JSON.stringify(customTiers));
-  localStorage.setItem(p + "bouquet", JSON.stringify(bouquet));
 }
 
 function loadLocal(login) {
@@ -443,8 +385,7 @@ function loadLocal(login) {
   try {
     S = {...DEFAULTS, ...(JSON.parse(localStorage.getItem(p + "settings")) || {})};
     customTiers = JSON.parse(localStorage.getItem(p + "customTiers")) || {};
-    bouquet = JSON.parse(localStorage.getItem(p + "bouquet")) || [];
-  } catch { S = {...DEFAULTS}; customTiers = {}; bouquet = []; }
+  } catch { S = {...DEFAULTS}; customTiers = {}; }
 }
 
 function save() {
@@ -457,7 +398,7 @@ function save() {
     try {
       const res = await rpc("fpc_save", {
         p_login: session.login, p_password: session.pass,
-        p_data: { settings: S, customTiers, bouquet }
+        p_data: { settings: S, customTiers }
       });
       el.textContent = res.ok
         ? "сохранено в облаке · " + new Date().toLocaleTimeString("ru-RU", {hour:"2-digit",minute:"2-digit"})
@@ -503,7 +444,6 @@ async function doAuth() {
   const d = res.data || {};
   if (d.settings) S = {...DEFAULTS, ...d.settings};
   if (d.customTiers) customTiers = d.customTiers;
-  if (d.bouquet) bouquet = d.bouquet;
   persistLocal();
   enterApp();
 }
@@ -512,7 +452,7 @@ function enterApp() {
   document.getElementById("auth-screen").style.display = "none";
   document.getElementById("app").style.display = "block";
   document.getElementById("who").textContent = session.login;
-  syncUI(); renderDatalist(); renderDict(); renderBouquet();
+  syncUI(); renderDatalist(); renderDict(); recalcStem();
 }
 
 function logout() {
@@ -522,7 +462,6 @@ function logout() {
   document.getElementById("auth-screen").style.display = "flex";
 }
 
-// авто-вход
 (async () => {
   try {
     const s = JSON.parse(localStorage.getItem("fpc3_session"));
@@ -534,7 +473,6 @@ function logout() {
         const d = res.data || {};
         if (d.settings) S = {...DEFAULTS, ...d.settings};
         if (d.customTiers) customTiers = d.customTiers;
-        if (d.bouquet) bouquet = d.bouquet;
         enterApp();
         return;
       }
@@ -543,7 +481,8 @@ function logout() {
 })();
 
 /* ================= ДВИЖОК ================= */
-const monthStems = () => Math.max((+S.planned_bouquets || 1) * (+S.avg_stems || 1), 1);
+// месячный объём в стеблях: новое поле stems_monthly, совместимость со старым planned_bouquets × avg_stems
+const monthStems = () => Math.max(+S.stems_monthly || ((+S.planned_bouquets || 500) * (+S.avg_stems || 12)), 1);
 
 function stemCost(purchase) {
   const delivery = S.delivery_mode === "paid"
@@ -555,9 +494,8 @@ function stemCost(purchase) {
   const pack = S.pack_in_stem ? +S.pack_per_stem || 0 : 0;
   const fixedBase = (+S.fixed_monthly || 0) / monthStems();
   const floristSalary = S.florist_mode === "salary" ? (+S.florist_salary || 0) / monthStems() : 0;
-  const floristFix = S.florist_mode === "fixed" ? (+S.florist_fixed || 0) / Math.max(+S.avg_stems || 1, 1) : 0;
-  const C = withWaste + pack + fixedBase + driver + floristSalary + floristFix;
-  return { delivery, driver, landed, withWaste, wasteAdd, pack, fixedBase, floristSalary, floristFix, C };
+  const C = withWaste + pack + fixedBase + driver + floristSalary;
+  return { delivery, driver, landed, withWaste, wasteAdd, pack, fixedBase, floristSalary, C };
 }
 
 function prettyPrice(p) {
@@ -603,7 +541,7 @@ function stemPrice(purchase, tier, mode) {
 }
 
 /* ================= UI: СТЕБЕЛЬ ================= */
-let currentTier = null, currentResult = null;
+let currentTier = null;
 
 function detectTier(name) {
   const n = name.trim().toLowerCase();
@@ -646,19 +584,16 @@ function manualTier(t) {
 
 function recalcStem() {
   const box = document.getElementById("stem-result");
-  const btn = document.getElementById("btn-add");
   const purchase = +document.getElementById("stem-price").value;
-  if (!currentTier || !(purchase > 0)) { box.innerHTML = ""; btn.style.display = "none"; currentResult = null; return; }
+  if (!currentTier || !(purchase > 0)) { box.innerHTML = ""; return; }
 
   const r = stemPrice(purchase, currentTier, S.tax_mode);
-  currentResult = r;
-  btn.style.display = "block";
+  const rAlt = stemPrice(purchase, currentTier, S.tax_mode === "usn6" ? "usn15" : "usn6");
   const pathTxt = r.pathUsed === "formula"
     ? "себестоимость + налоги + маржа"
     : `коэффициент плана ×${r.k}`;
 
   const rows = [
-    `<div class="l head"><span>Цена продажи стебля</span><b style="font-size:19px;color:var(--navy)">${fmt(r.price)}</b></div>`,
     `<div class="l"><span>наценка ×${r.markup.toFixed(1)} · ${pathTxt}</span><b></b></div>`,
     `<div class="l"><span>закупка</span><b>${fmt(r.cost.landed - r.cost.delivery)}</b></div>`,
   ];
@@ -668,95 +603,27 @@ function recalcStem() {
   if (r.cost.pack) rows.push(`<div class="l"><span>упаковка стебля</span><b>${fmt(r.cost.pack)}</b></div>`);
   rows.push(`<div class="l"><span>аренда и постоянные</span><b>${fmt(r.cost.fixedBase)}</b></div>`);
   if (r.cost.floristSalary) rows.push(`<div class="l"><span>флорист (оклад на стебель)</span><b>${fmt(r.cost.floristSalary)}</b></div>`);
-  if (r.cost.floristFix) rows.push(`<div class="l"><span>флорист (фикс на стебель)</span><b>${fmt(r.cost.floristFix)}</b></div>`);
   if (S.vat_on) rows.push(`<div class="l"><span>НДС ${S.vat_rate}% в цене</span><b>${fmt(r.vat)}</b></div>`);
   rows.push(`<div class="l"><span>УСН в цене</span><b>${fmt(r.tax)}</b></div>`);
   rows.push(`<div class="l"><span>эквайринг/комиссии</span><b>${fmt(r.acq)}</b></div>`);
   if (r.flVar) rows.push(`<div class="l"><span>флорист (% от цены)</span><b>${fmt(r.flVar)}</b></div>`);
   rows.push(`<div class="l profit"><span>Прибыль со стебля</span><b>${fmt(r.profit)}</b></div>`);
+  rows.push(`<div class="l"><span>при ${S.tax_mode === "usn6" ? "УСН 15%" : "УСН 6%"} было бы</span><b>${fmt(rAlt.price)}</b></div>`);
 
-  box.innerHTML = `<div class="break" style="margin-top:12px">${rows.join("")}</div>`;
-}
-
-/* ================= UI: БУКЕТ ================= */
-function addToBouquet() {
-  const name = document.getElementById("stem-name").value.trim();
-  const purchase = +document.getElementById("stem-price").value;
-  if (!name || !currentTier || !(purchase > 0)) return;
-  const ex = bouquet.find(b => b.name === name && b.purchase === purchase);
-  if (ex) ex.qty += 1; else bouquet.push({ name, tier: currentTier, purchase, qty: 1 });
-  save(); renderBouquet();
-}
-function chgQty(i, d) {
-  bouquet[i].qty += d;
-  if (bouquet[i].qty <= 0) bouquet.splice(i, 1);
-  save(); renderBouquet();
-}
-function delItem(i) { bouquet.splice(i, 1); save(); renderBouquet(); }
-
-function renderBouquet() {
-  const box = document.getElementById("bouquet-list");
-  box.innerHTML = bouquet.length ? bouquet.map((b, i) => {
-    const r = stemPrice(b.purchase, b.tier, S.tax_mode);
-    return `<div class="line-item">
-      <div class="nm">${b.name}<small>${TIER_NAMES[b.tier]} · закупка ${fmt(b.purchase)} · цена ${fmt(r.price)}</small></div>
-      <div class="qty">
-        <button onclick="chgQty(${i},-1)">−</button><b>${b.qty}</b><button onclick="chgQty(${i},1)">+</button>
-      </div>
-      <button class="del" onclick="delItem(${i})">✕</button>
-    </div>`;
-  }).join("") : `<div class="hint">Пока пусто — рассчитайте стебель выше и добавьте его в букет.</div>`;
-  recalcBouquet();
-}
-
-function recalcBouquet() {
-  const hero = document.getElementById("hero-price");
-  const sub = document.getElementById("hero-sub");
-  const alt = document.getElementById("hero-alt");
-  const br = document.getElementById("breakdown");
-  if (!bouquet.length) {
-    hero.textContent = "0 ₽"; sub.textContent = "соберите букет из стеблей выше";
-    alt.textContent = ""; br.innerHTML = ""; return;
-  }
-  let total = 0, cost = 0, profit = 0, vat = 0, tax = 0, acq = 0, fl = 0;
-  const parts = [];
-  for (const b of bouquet) {
-    const r = stemPrice(b.purchase, b.tier, S.tax_mode);
-    total += r.price * b.qty;
-    cost += r.cost.C * b.qty;
-    profit += r.profit * b.qty;
-    vat += r.vat * b.qty; tax += r.tax * b.qty;
-    acq += r.acq * b.qty; fl += (r.flVar + r.cost.floristFix + r.cost.floristSalary) * b.qty;
-    parts.push([`${b.name} × ${b.qty}`, r.price * b.qty]);
-  }
-  const pack = +document.getElementById("extra-pack").value || 0;
-  const finalPrice = prettyPrice(total + pack);
-
-  hero.textContent = fmt(finalPrice);
-  sub.textContent = `себестоимость ${fmt(cost + pack)} · прибыль ≈ ${fmt(profit)} · маржа ${(profit / finalPrice * 100).toFixed(0)}%`;
-
-  let otherTotal = 0;
-  const otherMode = S.tax_mode === "usn6" ? "usn15" : "usn6";
-  for (const b of bouquet) otherTotal += stemPrice(b.purchase, b.tier, otherMode).price * b.qty;
-  alt.textContent = S.tax_mode === "usn6"
-    ? `Если бы УСН «Доходы−расходы» 15%: ≈ ${fmt(prettyPrice(otherTotal + pack))}`
-    : `Если бы УСН «Доходы» 6%: ≈ ${fmt(prettyPrice(otherTotal + pack))}`;
-
-  br.innerHTML = parts.map(([l, v]) => `<div class="l"><span>${l}</span><b>${fmt(v)}</b></div>`).join("")
-    + `<div class="l"><span>упаковка букета</span><b>${fmt(pack)}</b></div>`
-    + (S.vat_on ? `<div class="l"><span>— в т.ч. НДС</span><b>${fmt(vat)}</b></div>` : "")
-    + `<div class="l"><span>— в т.ч. УСН</span><b>${fmt(tax)}</b></div>`
-    + `<div class="l"><span>— в т.ч. работа флориста</span><b>${fmt(fl)}</b></div>`
-    + `<div class="l"><span>— в т.ч. эквайринг/комиссии</span><b>${fmt(acq)}</b></div>`
-    + `<div class="l profit"><span>Чистая прибыль</span><b>${fmt(profit)}</b></div>`;
+  box.innerHTML = `
+    <div class="price-head" style="margin-top:14px">
+      <div class="cap">Цена продажи стебля</div>
+      <div class="val">${fmt(r.price)}</div>
+    </div>
+    <div class="break">${rows.join("")}</div>`;
 }
 
 /* ================= НАСТРОЙКИ UI ================= */
-function setNum(k, v) { S[k] = +v || 0; save(); recalcStem(); renderBouquet(); }
-function setSeg(k, v) { S[k] = v; save(); syncUI(); recalcStem(); renderBouquet(); }
-function setVatOn(on) { S.vat_on = on; save(); syncUI(); recalcStem(); renderBouquet(); }
-function setVatRate(r) { S.vat_rate = r; S.vat_on = true; save(); syncUI(); recalcStem(); renderBouquet(); }
-function setPackIn(on) { S.pack_in_stem = on; save(); syncUI(); recalcStem(); renderBouquet(); }
+function setNum(k, v) { S[k] = +v || 0; save(); recalcStem(); }
+function setSeg(k, v) { S[k] = v; save(); syncUI(); recalcStem(); }
+function setVatOn(on) { S.vat_on = on; save(); syncUI(); recalcStem(); }
+function setVatRate(r) { S.vat_rate = r; S.vat_on = true; save(); syncUI(); recalcStem(); }
+function setPackIn(on) { S.pack_in_stem = on; save(); syncUI(); recalcStem(); }
 
 function syncSeg(id, val) {
   document.querySelectorAll("#" + id + " button").forEach(b =>
@@ -778,7 +645,6 @@ function syncUI() {
   document.getElementById("delivery-driver").style.display = S.delivery_mode === "driver" ? "block" : "none";
   document.getElementById("pack-box").style.display = S.pack_in_stem ? "block" : "none";
   document.getElementById("florist-percent").style.display = S.florist_mode === "percent" ? "block" : "none";
-  document.getElementById("florist-fixed").style.display = S.florist_mode === "fixed" ? "block" : "none";
   document.getElementById("florist-salary").style.display = S.florist_mode === "salary" ? "block" : "none";
 }
 
