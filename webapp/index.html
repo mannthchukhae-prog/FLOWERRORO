@@ -7,87 +7,121 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    --green: #1f8a4c;
-    --green-deep: #146536;
-    --ink: #14231a;
-    --muted: #6f8377;
-    --line: #dce8e0;
-    --card: rgba(255,255,255,.82);
-    --soft: rgba(31,138,76,.07);
+    --navy: #1b3a6b;
+    --navy-deep: #12294d;
+    --blue: #2f6fb3;
+    --sky: #2f8fd0;
+    --ink: #17222e;
+    --muted: #76869a;
+    --line: #dfe5ee;
+    --bg: #f4f6fa;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, 'SF Pro Text', Roboto, 'Segoe UI', sans-serif;
-    color: var(--ink);
-    background:
-      linear-gradient(180deg, rgba(31,138,76,.06), rgba(31,138,76,0) 320px),
-      #fbfdfc;
-    min-height: 100vh;
-    padding: 16px 14px 90px;
-    font-size: 15px;
+    color: var(--ink); background: var(--bg);
+    min-height: 100vh; font-size: 15px;
+  }
+
+  /* ================= ЭКРАН ВХОДА ================= */
+  #auth-screen { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth-top {
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-deep) 100%);
+    flex: 0 0 44vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 18px;
+  }
+  .auth-top svg { width: 92px; height: 92px; }
+  .auth-top .title {
+    color: #fff; font-size: 17px; font-weight: 800;
+    letter-spacing: .18em; text-transform: uppercase; text-align: center;
+  }
+  .auth-top .subtitle { color: rgba(255,255,255,.55); font-size: 12px; letter-spacing: .06em; }
+  .auth-body {
+    flex: 1; background: #fff; padding: 28px 26px 40px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .auth-body input {
+    width: 100%; padding: 13px 14px; margin-bottom: 14px;
+    border: 1px solid var(--line); border-radius: 4px; font-size: 16px;
+    background: #fff; color: var(--ink); outline: none;
+  }
+  .auth-body input:focus { border-color: var(--navy); }
+  .btn-navy {
+    width: 100%; padding: 13px; border: 0; border-radius: 4px;
+    background: var(--navy); color: #fff; font-size: 14px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; cursor: pointer; margin-top: 6px;
+  }
+  .auth-links { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .auth-links a { color: var(--sky); text-decoration: none; font-weight: 600; cursor: pointer; }
+  .auth-error {
+    color: #c0392b; font-size: 13px; text-align: center;
+    margin-top: 10px; min-height: 18px;
+  }
+
+  /* ================= ОСНОВНОЙ ЭКРАН ================= */
+  #app { display: none; padding: 0 14px 90px; }
+  .topbar {
+    background: linear-gradient(160deg, var(--navy), var(--navy-deep));
+    margin: 0 -14px 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .topbar svg { width: 26px; height: 26px; flex: 0 0 auto; }
+  .topbar .who { flex: 1; color: #fff; font-size: 13.5px; font-weight: 700; letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar .logout {
+    border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff;
+    font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    padding: 6px 10px; border-radius: 4px; cursor: pointer;
   }
 
   .card {
-    background: var(--card);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 12px rgba(20,60,35,.05);
+    background: #fff; border: 1px solid var(--line); border-radius: 6px;
+    padding: 16px; margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(18,41,77,.05);
   }
-
-  h1 { font-size: 19px; font-weight: 700; margin: 2px 0 2px; }
-  .tagline { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
   h2 {
-    font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase;
-    color: var(--green-deep); margin-bottom: 12px; font-weight: 700;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--navy); margin-bottom: 12px; font-weight: 800;
   }
-
-  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  label { display: block; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 10px 0 4px; font-weight: 600; }
   input {
-    width: 100%; padding: 10px 12px; border-radius: 8px; font-size: 16px;
+    width: 100%; padding: 10px 12px; border-radius: 4px; font-size: 16px;
     border: 1px solid var(--line); background: #fff; color: var(--ink); outline: none;
   }
-  input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(31,138,76,.10); }
+  input:focus { border-color: var(--navy); }
   .row { display: flex; gap: 8px; }
   .row > div { flex: 1; }
 
   .seg { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
   .seg button {
-    flex: 1; min-width: 84px; padding: 9px 6px; border-radius: 8px;
+    flex: 1; min-width: 84px; padding: 9px 6px; border-radius: 4px;
     border: 1px solid var(--line); background: #fff;
-    font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer;
+    font-size: 12.5px; font-weight: 600; color: var(--muted); cursor: pointer;
   }
-  .seg button.on {
-    background: var(--green); color: #fff; border-color: var(--green);
-  }
+  .seg button.on { background: var(--navy); color: #fff; border-color: var(--navy); }
 
   .chip {
-    display: inline-block; padding: 4px 10px; border-radius: 6px;
-    font-size: 12px; font-weight: 700; margin-top: 8px;
-    background: var(--soft); color: var(--green-deep);
-    border: 1px solid var(--line);
+    display: inline-block; padding: 4px 10px; border-radius: 4px;
+    font-size: 11.5px; font-weight: 700; margin-top: 8px;
+    background: #eef3fa; color: var(--navy); border: 1px solid var(--line);
+    letter-spacing: .03em;
   }
-  .chip.t1 { background: rgba(160,60,100,.07); color: #8f3a5e; border-color: #ecd9e1; }
-  .chip.detail { background: rgba(190,140,40,.08); color: #8a6416; border-color: #eee3c8; }
+  .chip.t1 { background: #faf0f4; color: #8f3a5e; border-color: #e8d3dd; }
+  .chip.detail { background: #faf5ea; color: #8a6416; border-color: #eadfc2; }
 
   button.primary {
-    width: 100%; padding: 12px; border: 0; border-radius: 8px;
-    background: var(--green); color: #fff; font-size: 15px; font-weight: 700;
-    margin-top: 12px; cursor: pointer;
+    width: 100%; padding: 12px; border: 0; border-radius: 4px;
+    background: var(--navy); color: #fff; font-size: 14px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; margin-top: 12px; cursor: pointer;
   }
 
   .hero {
-    padding: 18px 16px; border-radius: 12px; margin-bottom: 12px;
-    background: var(--green-deep); color: #fff;
-    border: 1px solid var(--green-deep);
+    padding: 18px 16px; border-radius: 6px; margin-bottom: 12px;
+    background: linear-gradient(160deg, var(--navy), var(--navy-deep)); color: #fff;
   }
-  .hero .cap { font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase; opacity: .75; font-weight: 700; }
+  .hero .cap { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; opacity: .65; font-weight: 800; }
   .hero .val { font-size: 38px; font-weight: 800; margin-top: 2px; }
   .hero .sub { font-size: 12.5px; opacity: .85; margin-top: 4px; }
-  .hero .alt { font-size: 12px; opacity: .65; margin-top: 8px; }
+  .hero .alt { font-size: 12px; opacity: .6; margin-top: 8px; }
 
   .line-item {
     display: flex; align-items: center; gap: 8px; padding: 9px 0;
@@ -98,8 +132,8 @@
   .line-item .nm small { display: block; color: var(--muted); font-size: 12px; }
   .qty { display: flex; align-items: center; gap: 8px; }
   .qty button {
-    width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--line);
-    background: #fff; color: var(--green-deep); font-size: 16px; font-weight: 700; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--line);
+    background: #fff; color: var(--navy); font-size: 16px; font-weight: 700; cursor: pointer;
   }
   .qty b { min-width: 20px; text-align: center; font-size: 14.5px; }
   .del { color: #b33; font-size: 14px; border: 0; background: none; cursor: pointer; padding: 4px; }
@@ -112,14 +146,14 @@
   .break .l:last-child { border-bottom: 0; }
   .break .l span { color: var(--muted); }
   .break .l b { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .break .l.profit span, .break .l.profit b { color: var(--green-deep); font-weight: 800; }
+  .break .l.profit span, .break .l.profit b { color: var(--navy); font-weight: 800; }
   .break .l.head span { color: var(--ink); font-weight: 700; }
 
   details.card { padding: 0; overflow: hidden; }
   details.card summary {
     list-style: none; cursor: pointer; padding: 14px 16px;
-    font-weight: 700; font-size: 14px; color: var(--ink);
-    display: flex; justify-content: space-between; align-items: center;
+    font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--navy); display: flex; justify-content: space-between; align-items: center;
   }
   details.card summary::after { content: "+"; font-size: 16px; color: var(--muted); }
   details.card[open] summary::after { content: "–"; }
@@ -127,172 +161,220 @@
 
   .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
   .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sync-status { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<h1>Калькулятор цены цветка</h1>
-<div class="tagline">Название и закупочная цена стебля — всё остальное зашито: налоги, доставка, зарплаты, упаковка, маржа.</div>
-
-<!-- ================= РАСЧЁТ СТЕБЛЯ ================= -->
-<div class="card">
-  <h2>Расчёт стебля</h2>
-  <label>Название цветка</label>
-  <input id="stem-name" list="flower-names" placeholder="Начните вводить: роза, гортензия…" oninput="onNameInput()">
-  <datalist id="flower-names"></datalist>
-  <div id="tier-chip"></div>
-  <div id="tier-pick" style="display:none">
-    <label>Нет в справочнике — выберите план вручную:</label>
-    <div class="seg" id="seg-tier-manual">
-      <button data-v="t1" onclick="manualTier('t1')">1-й план</button>
-      <button data-v="t2" onclick="manualTier('t2')">2-й план</button>
-      <button data-v="detail" onclick="manualTier('detail')">Деталь</button>
-      <button data-v="green" onclick="manualTier('green')">Зелень</button>
+<!-- ================= ЭКРАН ВХОДА / РЕГИСТРАЦИИ ================= -->
+<div id="auth-screen">
+  <div class="auth-top">
+    <svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="50" cy="50" r="46" opacity=".35"/>
+      <path d="M50 78 V48"/>
+      <path d="M50 60 C 42 60, 36 54, 36 46 C 44 46, 50 52, 50 60"/>
+      <path d="M50 66 C 58 66, 64 60, 64 52 C 56 52, 50 58, 50 66"/>
+      <path d="M50 48 C 50 34, 40 30, 35 30 C 35 42, 42 48, 50 48"/>
+      <path d="M50 48 C 50 34, 60 30, 65 30 C 65 42, 58 48, 50 48"/>
+      <circle cx="50" cy="26" r="4"/>
+    </svg>
+    <div>
+      <div class="title">Цветочный<br>калькулятор</div>
+    </div>
+    <div class="subtitle">цена стебля и букета с учётом всех расходов</div>
+  </div>
+  <div class="auth-body">
+    <input id="auth-login" placeholder="Логин" autocomplete="username">
+    <input id="auth-pass" type="password" placeholder="Пароль" autocomplete="current-password">
+    <input id="auth-pass2" type="password" placeholder="Повторите пароль" style="display:none">
+    <button class="btn-navy" id="btn-auth" onclick="doAuth()">Войти</button>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="auth-links" id="auth-toggle">
+      Нет аккаунта? <a onclick="toggleAuth()">Регистрация</a>
     </div>
   </div>
-  <label>Закупочная цена стебля, ₽</label>
-  <input id="stem-price" type="number" min="0" inputmode="decimal" placeholder="130" oninput="recalcStem()">
-
-  <div id="stem-result"></div>
-  <button class="primary" id="btn-add" onclick="addToBouquet()" style="display:none">Добавить в букет</button>
 </div>
 
-<!-- ================= БУКЕТ ================= -->
-<div class="hero">
-  <div class="cap">Цена букета</div>
-  <div class="val" id="hero-price">0 ₽</div>
-  <div class="sub" id="hero-sub">соберите букет из стеблей выше</div>
-  <div class="alt" id="hero-alt"></div>
-</div>
-
-<div class="card">
-  <h2>Состав букета</h2>
-  <div id="bouquet-list"></div>
-  <label>Общая упаковка букета (бумага, ленты, открытка), ₽</label>
-  <input id="extra-pack" type="number" min="0" value="150" oninput="recalcBouquet()">
-</div>
-
-<div class="card">
-  <h2>Что зашито в цену букета</h2>
-  <div class="break" id="breakdown"></div>
-</div>
-
-<!-- ================= НАСТРОЙКИ ================= -->
-<details class="card" open><summary>Налоги</summary><div class="body">
-  <label>Объект УСН</label>
-  <div class="seg" id="seg-tax">
-    <button data-v="usn6" onclick="setSeg('tax_mode','usn6')">Доходы 6%</button>
-    <button data-v="usn15" onclick="setSeg('tax_mode','usn15')">Дох.−расх. 15%</button>
+<!-- ================= ПРИЛОЖЕНИЕ ================= -->
+<div id="app">
+  <div class="topbar">
+    <svg viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round">
+      <path d="M50 82 V48"/><path d="M50 48 C50 32 38 28 32 28 C32 42 40 48 50 48"/>
+      <path d="M50 48 C50 32 62 28 68 28 C68 42 60 48 50 48"/><circle cx="50" cy="22" r="6"/>
+    </svg>
+    <div class="who" id="who"></div>
+    <button class="logout" onclick="logout()">Выйти</button>
   </div>
-  <label>НДС</label>
-  <div class="seg" id="seg-vat">
-    <button data-v="on" onclick="setVatOn(true)">Плачу НДС</button>
-    <button data-v="off" onclick="setVatOn(false)">Нет НДС (доход &lt; 20 млн)</button>
-  </div>
-  <div id="vat-rate-box">
-    <label>Ставка НДС, %</label>
-    <div class="seg" id="seg-vatrate">
-      <button data-v="5" onclick="setVatRate(5)">5% (до ~272 млн)</button>
-      <button data-v="7" onclick="setVatRate(7)">7% (до ~490 млн)</button>
-      <button data-v="22" onclick="setVatRate(22)">22% общая</button>
+
+  <div class="card">
+    <h2>Расчёт стебля</h2>
+    <label>Название цветка</label>
+    <input id="stem-name" list="flower-names" placeholder="Начните вводить: роза, гортензия…" oninput="onNameInput()">
+    <datalist id="flower-names"></datalist>
+    <div id="tier-chip"></div>
+    <div id="tier-pick" style="display:none">
+      <label>Нет в справочнике — выберите план вручную</label>
+      <div class="seg" id="seg-tier-manual">
+        <button data-v="t1" onclick="manualTier('t1')">1-й план</button>
+        <button data-v="t2" onclick="manualTier('t2')">2-й план</button>
+        <button data-v="detail" onclick="manualTier('detail')">Деталь</button>
+        <button data-v="green" onclick="manualTier('green')">Зелень</button>
+      </div>
     </div>
+    <label>Закупочная цена стебля, ₽</label>
+    <input id="stem-price" type="number" min="0" inputmode="decimal" placeholder="130" oninput="recalcStem()">
+    <div id="stem-result"></div>
+    <button class="primary" id="btn-add" onclick="addToBouquet()" style="display:none">Добавить в букет</button>
   </div>
-</div></details>
 
-<details class="card"><summary>Доставка от базы до салона</summary><div class="body">
-  <div class="seg" id="seg-delivery">
-    <button data-v="free" onclick="setSeg('delivery_mode','free')">Бесплатная</button>
-    <button data-v="paid" onclick="setSeg('delivery_mode','paid')">Платная</button>
-    <button data-v="driver" onclick="setSeg('delivery_mode','driver')">Свой водитель</button>
+  <div class="hero">
+    <div class="cap">Цена букета</div>
+    <div class="val" id="hero-price">0 ₽</div>
+    <div class="sub" id="hero-sub">соберите букет из стеблей выше</div>
+    <div class="alt" id="hero-alt"></div>
   </div>
-  <div id="delivery-paid" style="display:none">
+
+  <div class="card">
+    <h2>Состав букета</h2>
+    <div id="bouquet-list"></div>
+    <label>Общая упаковка букета (бумага, ленты, открытка), ₽</label>
+    <input id="extra-pack" type="number" min="0" value="150" oninput="recalcBouquet()">
+  </div>
+
+  <div class="card">
+    <h2>Что зашито в цену букета</h2>
+    <div class="break" id="breakdown"></div>
+  </div>
+
+  <details class="card"><summary>Налоги</summary><div class="body">
+    <label>Объект УСН</label>
+    <div class="seg" id="seg-tax">
+      <button data-v="usn6" onclick="setSeg('tax_mode','usn6')">Доходы 6%</button>
+      <button data-v="usn15" onclick="setSeg('tax_mode','usn15')">Дох.−расх. 15%</button>
+    </div>
+    <label>НДС</label>
+    <div class="seg" id="seg-vat">
+      <button data-v="on" onclick="setVatOn(true)">Плачу НДС</button>
+      <button data-v="off" onclick="setVatOn(false)">Нет НДС (доход &lt; 20 млн)</button>
+    </div>
+    <div id="vat-rate-box">
+      <label>Ставка НДС, %</label>
+      <div class="seg" id="seg-vatrate">
+        <button data-v="5" onclick="setVatRate(5)">5% (до ~272 млн)</button>
+        <button data-v="7" onclick="setVatRate(7)">7% (до ~490 млн)</button>
+        <button data-v="22" onclick="setVatRate(22)">22% общая</button>
+      </div>
+    </div>
+  </div></details>
+
+  <details class="card"><summary>Доставка от базы до салона</summary><div class="body">
+    <div class="seg" id="seg-delivery">
+      <button data-v="free" onclick="setSeg('delivery_mode','free')">Бесплатная</button>
+      <button data-v="paid" onclick="setSeg('delivery_mode','paid')">Платная</button>
+      <button data-v="driver" onclick="setSeg('delivery_mode','driver')">Свой водитель</button>
+    </div>
+    <div id="delivery-paid" style="display:none">
+      <div class="row">
+        <div><label>Стоимость рейса, ₽</label><input id="s-delivery_trip" type="number" oninput="setNum('delivery_trip',this.value)"></div>
+        <div><label>Стеблей в поставке</label><input id="s-stems_per_trip" type="number" oninput="setNum('stems_per_trip',this.value)"></div>
+      </div>
+      <div class="hint">Стоимость рейса делится на каждый стебель поставки.</div>
+    </div>
+    <div id="delivery-driver" style="display:none">
+      <label>Оклад водителя, ₽/мес</label>
+      <input id="s-driver_salary" type="number" oninput="setNum('driver_salary',this.value)">
+      <div class="hint">Оклад делится на все стебли месяца — отдельная строка в разбивке.</div>
+    </div>
+  </div></details>
+
+  <details class="card"><summary>Персонал, расходы и маржа</summary><div class="body">
+    <label>Оплата флориста</label>
+    <div class="seg" id="seg-florist">
+      <button data-v="percent" onclick="setSeg('florist_mode','percent')">% от цены</button>
+      <button data-v="fixed" onclick="setSeg('florist_mode','fixed')">Фикс/букет</button>
+      <button data-v="salary" onclick="setSeg('florist_mode','salary')">Оклад</button>
+    </div>
+    <div id="florist-percent">
+      <label>Флорист, % от цены</label>
+      <input id="s-florist_pct" type="number" step="0.1" oninput="setNum('florist_pct',this.value)">
+    </div>
+    <div id="florist-fixed" style="display:none">
+      <label>Флорист, фикс ₽ за букет</label>
+      <input id="s-florist_fixed" type="number" oninput="setNum('florist_fixed',this.value)">
+    </div>
+    <div id="florist-salary" style="display:none">
+      <label>Оклад флориста, ₽/мес</label>
+      <input id="s-florist_salary" type="number" oninput="setNum('florist_salary',this.value)">
+    </div>
     <div class="row">
-      <div><label>Стоимость рейса, ₽</label><input id="s-delivery_trip" type="number" oninput="setNum('delivery_trip',this.value)"></div>
-      <div><label>Стеблей в поставке</label><input id="s-stems_per_trip" type="number" oninput="setNum('stems_per_trip',this.value)"></div>
+      <div><label>Аренда + коммуналка, ₽/мес</label><input id="s-fixed_monthly" type="number" oninput="setNum('fixed_monthly',this.value)"></div>
+      <div><label>План продаж, букетов/мес</label><input id="s-planned_bouquets" type="number" oninput="setNum('planned_bouquets',this.value)"></div>
     </div>
-    <div class="hint">Стоимость рейса делится на каждый стебель поставки.</div>
-  </div>
-  <div id="delivery-driver" style="display:none">
-    <label>Оклад водителя, ₽/мес</label>
-    <input id="s-driver_salary" type="number" oninput="setNum('driver_salary',this.value)">
-    <div class="hint">Оклад делится на все стебли месяца и показывается в разбивке отдельной строкой.</div>
-  </div>
-</div></details>
+    <div class="row">
+      <div><label>Стеблей в букете в среднем</label><input id="s-avg_stems" type="number" oninput="setNum('avg_stems',this.value)"></div>
+      <div><label>Убыль/списания, %</label><input id="s-waste_pct" type="number" step="0.5" oninput="setNum('waste_pct',this.value)"></div>
+    </div>
+    <div class="row">
+      <div><label>Эквайринг, %</label><input id="s-acquiring_pct" type="number" step="0.1" oninput="setNum('acquiring_pct',this.value)"></div>
+      <div><label>Маркетплейс, %</label><input id="s-marketplace_pct" type="number" step="0.1" oninput="setNum('marketplace_pct',this.value)"></div>
+    </div>
+    <label>Целевая чистая маржа, % от цены</label>
+    <input id="s-target_margin_pct" type="number" step="0.5" oninput="setNum('target_margin_pct',this.value)">
+  </div></details>
 
-<details class="card"><summary>Персонал, расходы и маржа</summary><div class="body">
-  <label>Оплата флориста</label>
-  <div class="seg" id="seg-florist">
-    <button data-v="percent" onclick="setSeg('florist_mode','percent')">% от цены</button>
-    <button data-v="fixed" onclick="setSeg('florist_mode','fixed')">Фикс/букет</button>
-    <button data-v="salary" onclick="setSeg('florist_mode','salary')">Оклад</button>
-  </div>
-  <div id="florist-percent">
-    <label>Флорист, % от цены</label>
-    <input id="s-florist_pct" type="number" step="0.1" oninput="setNum('florist_pct',this.value)">
-  </div>
-  <div id="florist-fixed" style="display:none">
-    <label>Флорист, фикс ₽ за букет</label>
-    <input id="s-florist_fixed" type="number" oninput="setNum('florist_fixed',this.value)">
-  </div>
-  <div id="florist-salary" style="display:none">
-    <label>Оклад флориста, ₽/мес</label>
-    <input id="s-florist_salary" type="number" oninput="setNum('florist_salary',this.value)">
-  </div>
-  <div class="row">
-    <div><label>Аренда + коммуналка, ₽/мес</label><input id="s-fixed_monthly" type="number" oninput="setNum('fixed_monthly',this.value)"></div>
-    <div><label>План продаж, букетов/мес</label><input id="s-planned_bouquets" type="number" oninput="setNum('planned_bouquets',this.value)"></div>
-  </div>
-  <div class="row">
-    <div><label>Стеблей в букете в среднем</label><input id="s-avg_stems" type="number" oninput="setNum('avg_stems',this.value)"></div>
-    <div><label>Убыль/списания, %</label><input id="s-waste_pct" type="number" step="0.5" oninput="setNum('waste_pct',this.value)"></div>
-  </div>
-  <div class="row">
-    <div><label>Эквайринг, %</label><input id="s-acquiring_pct" type="number" step="0.1" oninput="setNum('acquiring_pct',this.value)"></div>
-    <div><label>Маркетплейс, %</label><input id="s-marketplace_pct" type="number" step="0.1" oninput="setNum('marketplace_pct',this.value)"></div>
-  </div>
-  <label>Целевая чистая маржа, % от цены</label>
-  <input id="s-target_margin_pct" type="number" step="0.5" oninput="setNum('target_margin_pct',this.value)">
-</div></details>
+  <details class="card"><summary>Упаковка</summary><div class="body">
+    <label>Упаковка входит в цену стебля?</label>
+    <div class="seg" id="seg-pack">
+      <button data-v="yes" onclick="setPackIn(true)">Да, входит</button>
+      <button data-v="no" onclick="setPackIn(false)">Нет, отдельно</button>
+    </div>
+    <div id="pack-box">
+      <label>Упаковка на стебель, ₽</label>
+      <input id="s-pack_per_stem" type="number" oninput="setNum('pack_per_stem',this.value)">
+    </div>
+    <div class="hint">«Входит» — плёнка на каждую розу в витрине. «Отдельно» — упаковка только на букет целиком.</div>
+  </div></details>
 
-<details class="card"><summary>Упаковка</summary><div class="body">
-  <label>Упаковка входит в цену стебля?</label>
-  <div class="seg" id="seg-pack">
-    <button data-v="yes" onclick="setPackIn(true)">Да, входит</button>
-    <button data-v="no" onclick="setPackIn(false)">Нет, отдельно</button>
-  </div>
-  <div id="pack-box">
-    <label>Упаковка на стебель, ₽</label>
-    <input id="s-pack_per_stem" type="number" oninput="setNum('pack_per_stem',this.value)">
-  </div>
-  <div class="hint">«Входит» — например, плёнка на каждую розу в витрине. «Отдельно» — упаковка считается только на букет целиком.</div>
-</div></details>
+  <details class="card"><summary>Коэффициенты наценки по планам</summary><div class="body">
+    <div class="tier-grid">
+      <div><label>1-й план, ×</label><input id="s-k_t1" type="number" step="0.1" oninput="setNum('k_t1',this.value)"></div>
+      <div><label>2-й план, ×</label><input id="s-k_t2" type="number" step="0.1" oninput="setNum('k_t2',this.value)"></div>
+      <div><label>Детали, ×</label><input id="s-k_detail" type="number" step="0.1" oninput="setNum('k_detail',this.value)"></div>
+      <div><label>Зелень, ×</label><input id="s-k_green" type="number" step="0.1" oninput="setNum('k_green',this.value)"></div>
+    </div>
+    <div class="hint">Цена стебля = максимум из «себестоимость + налоги + маржа» и «закупка × коэффициент плана». Зелень закупается дёшево, её коэффициент самый высокий — до ×6.</div>
+  </div></details>
 
-<details class="card"><summary>Коэффициенты наценки по планам</summary><div class="body">
-  <div class="tier-grid">
-    <div><label>1-й план, ×</label><input id="s-k_t1" type="number" step="0.1" oninput="setNum('k_t1',this.value)"></div>
-    <div><label>2-й план, ×</label><input id="s-k_t2" type="number" step="0.1" oninput="setNum('k_t2',this.value)"></div>
-    <div><label>Детали, ×</label><input id="s-k_detail" type="number" step="0.1" oninput="setNum('k_detail',this.value)"></div>
-    <div><label>Зелень, ×</label><input id="s-k_green" type="number" step="0.1" oninput="setNum('k_green',this.value)"></div>
-  </div>
-  <div class="hint">Цена стебля = максимум из двух расчётов: «себестоимость + налоги + маржа» и «закупка × коэффициент плана». Зелень закупается дёшево, поэтому её коэффициент самый высокий — до ×6.</div>
-</div></details>
+  <details class="card"><summary>Справочник цветов по планам</summary><div class="body">
+    <div id="dict-list"></div>
+    <div class="hint">Начните вводить название в расчёте стебля — план определится автоматически. Неизвестный цветок можно отнести к плану вручную — приложение запомнит.</div>
+  </div></details>
 
-<!-- ================= СПРАВОЧНИК ================= -->
-<details class="card"><summary>Справочник цветов по планам</summary><div class="body">
-  <div id="dict-list"></div>
-  <div class="hint">Начните вводить название в расчёте стебля — план определится автоматически. Неизвестный цветок можно отнести к плану вручную — приложение запомнит.</div>
-</div></details>
+  <div class="sync-status" id="sync-status"></div>
+</div>
 
 <script>
-/* ============ СПРАВОЧНИК ЦВЕТОВ ПО ПЛАНАМ ============ */
+/* ================= SUPABASE ================= */
+const SB_URL = "https://vhjuobijgsmgjxwzhxmy.supabase.co";
+const SB_KEY = "sb_publishable_M6iufRuCU761wZn1np2JLQ_0IMtO9K7";
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers: { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY,
+               "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+/* ================= СПРАВОЧНИК ================= */
 const FLOWER_DB = {
-  // первый план — крупные акценты
   "Роза": "t1", "Пион": "t1", "Гортензия": "t1", "Георгин": "t1",
   "Калла": "t1", "Лилия": "t1", "Гладиолус": "t1", "Амариллис": "t1",
   "Протея": "t1", "Антуриум": "t1", "Подсолнух": "t1", "Ранункулюс": "t1",
   "Орхидея Фаленопсис": "t1", "Орхидея Цимбидиум": "t1", "Орхидея Ванда": "t1",
-  "Сирень": "t1", "Кортедерия": "t1", "Пальма Рофалора": "t1",
-  // второй план — средние, дополняющие
+  "Сирень": "t1", "Кортедерия": "t1",
   "Роза кустовая": "t2", "Гвоздика": "t2", "Гвоздика кустовая": "t2",
   "Эустома": "t2", "Лизиантус": "t2", "Хризантема одноголовая": "t2",
   "Хризантема кустовая": "t2", "Гербера": "t2", "Гербера мини": "t2",
@@ -303,9 +385,7 @@ const FLOWER_DB = {
   "Лупин": "t2", "Вибурнум": "t2", "Клематис": "t2", "Алиум": "t2",
   "Трителея": "t2", "Агапантус": "t2", "Аквилегия": "t2", "Цинния": "t2",
   "Космея": "t2", "Седум": "t2", "Годеция": "t2", "Дицентра": "t2",
-  "Левкой": "t2", "Матрикария": "t2", "Ромашка": "t2", "Солнечник": "t2",
-  "Бовардия": "t2", "Калифорнийская роза": "t2",
-  // детали — мелкие акценты
+  "Левкой": "t2", "Матрикария": "t2", "Ромашка": "t2", "Бовардия": "t2",
   "Гипсофила": "detail", "Хамелациум": "detail", "Восковница": "detail",
   "Краспедия": "detail", "Бруния": "detail", "Оксипеталум": "detail",
   "Танацетум": "detail", "Хлопок": "detail", "Лагурус": "detail",
@@ -315,8 +395,7 @@ const FLOWER_DB = {
   "Эрингиум": "detail", "Амми": "detail", "Даукус": "detail",
   "Буплеурум": "detail", "Лунария": "detail", "Сетария": "detail",
   "Фаларис": "detail", "Бриза": "detail", "Пампасная трава": "detail",
-  "Скабиоза стеллата": "detail", "Перьевник": "detail", "Сухая зелень": "detail",
-  // зелень — разбавка и объём
+  "Скабиоза стеллата": "detail", "Сухая зелень": "detail",
   "Эвкалипт": "green", "Эвкалипт Цинерея": "green", "Эвкалипт Популюс": "green",
   "Эвкалипт Парвифолия": "green", "Эвкалипт Бэби блю": "green",
   "Фисташка": "green", "Салал": "green",
@@ -328,11 +407,10 @@ const FLOWER_DB = {
   "Плющ": "green", "Адиантум": "green", "Асплениум": "green",
   "Цикас": "green", "Шеффлера": "green", "Фикус ветка": "green"
 };
-
 const TIER_NAMES = { t1: "1-й план · главный акцент", t2: "2-й план · дополняет",
                      detail: "Деталь · мелкий акцент", green: "Зелень · объём" };
 
-/* ============ НАСТРОЙКИ ============ */
+/* ================= ДАННЫЕ ================= */
 const DEFAULTS = {
   tax_mode: "usn6", vat_on: true, vat_rate: 5,
   delivery_mode: "paid", delivery_trip: 1500, stems_per_trip: 300, driver_salary: 45000,
@@ -344,22 +422,129 @@ const DEFAULTS = {
   k_t1: 2.2, k_t2: 2.7, k_detail: 4.0, k_green: 6.0
 };
 
-let S = load("fpc2_settings", {...DEFAULTS});
-let customTiers = load("fpc2_custom_tiers", {});
-let bouquet = load("fpc2_bouquet", []);
+let S = {...DEFAULTS};
+let customTiers = {};
+let bouquet = [];
+let session = null;               // {login, pass}
+let saveTimer = null;
 
-function load(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }
-function save() {
-  localStorage.setItem("fpc2_settings", JSON.stringify(S));
-  localStorage.setItem("fpc2_custom_tiers", JSON.stringify(customTiers));
-  localStorage.setItem("fpc2_bouquet", JSON.stringify(bouquet));
-}
 const fmt = n => Math.round(n).toLocaleString("ru-RU") + " ₽";
 
-/* ============ ДВИЖОК ============ */
+function persistLocal() {
+  if (!session) return;
+  const p = "fpc3_" + session.login + "_";
+  localStorage.setItem(p + "settings", JSON.stringify(S));
+  localStorage.setItem(p + "customTiers", JSON.stringify(customTiers));
+  localStorage.setItem(p + "bouquet", JSON.stringify(bouquet));
+}
+
+function loadLocal(login) {
+  const p = "fpc3_" + login + "_";
+  try {
+    S = {...DEFAULTS, ...(JSON.parse(localStorage.getItem(p + "settings")) || {})};
+    customTiers = JSON.parse(localStorage.getItem(p + "customTiers")) || {};
+    bouquet = JSON.parse(localStorage.getItem(p + "bouquet")) || [];
+  } catch { S = {...DEFAULTS}; customTiers = {}; bouquet = []; }
+}
+
+function save() {
+  persistLocal();
+  if (!session) return;
+  clearTimeout(saveTimer);
+  const el = document.getElementById("sync-status");
+  el.textContent = "сохранение…";
+  saveTimer = setTimeout(async () => {
+    try {
+      const res = await rpc("fpc_save", {
+        p_login: session.login, p_password: session.pass,
+        p_data: { settings: S, customTiers, bouquet }
+      });
+      el.textContent = res.ok
+        ? "сохранено в облаке · " + new Date().toLocaleTimeString("ru-RU", {hour:"2-digit",minute:"2-digit"})
+        : "ошибка сохранения: " + (res.error || "");
+    } catch { el.textContent = "нет связи — данные на устройстве"; }
+  }, 700);
+}
+
+/* ================= АВТОРИЗАЦИЯ ================= */
+let authMode = "login";
+
+function toggleAuth() {
+  authMode = authMode === "login" ? "register" : "login";
+  document.getElementById("auth-pass2").style.display = authMode === "register" ? "block" : "none";
+  document.getElementById("btn-auth").textContent = authMode === "register" ? "Создать аккаунт" : "Войти";
+  document.getElementById("auth-toggle").innerHTML = authMode === "register"
+    ? 'Уже есть аккаунт? <a onclick="toggleAuth()">Войти</a>'
+    : 'Нет аккаунта? <a onclick="toggleAuth()">Регистрация</a>';
+  document.getElementById("auth-error").textContent = "";
+}
+
+async function doAuth() {
+  const login = document.getElementById("auth-login").value.trim();
+  const pass = document.getElementById("auth-pass").value;
+  const err = document.getElementById("auth-error");
+  err.textContent = "";
+  if (login.length < 3) { err.textContent = "Логин — минимум 3 символа"; return; }
+  if (pass.length < 4) { err.textContent = "Пароль — минимум 4 символа"; return; }
+
+  if (authMode === "register") {
+    if (pass !== document.getElementById("auth-pass2").value) {
+      err.textContent = "Пароли не совпадают"; return;
+    }
+    const res = await rpc("fpc_register", { p_login: login, p_password: pass });
+    if (!res.ok) { err.textContent = res.error || "Ошибка регистрации"; return; }
+  }
+  const res = await rpc("fpc_login", { p_login: login, p_password: pass });
+  if (!res.ok) { err.textContent = res.error || "Ошибка входа"; return; }
+
+  session = { login, pass };
+  localStorage.setItem("fpc3_session", JSON.stringify(session));
+  loadLocal(login);
+  const d = res.data || {};
+  if (d.settings) S = {...DEFAULTS, ...d.settings};
+  if (d.customTiers) customTiers = d.customTiers;
+  if (d.bouquet) bouquet = d.bouquet;
+  persistLocal();
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  document.getElementById("who").textContent = session.login;
+  syncUI(); renderDatalist(); renderDict(); renderBouquet();
+}
+
+function logout() {
+  localStorage.removeItem("fpc3_session");
+  session = null;
+  document.getElementById("app").style.display = "none";
+  document.getElementById("auth-screen").style.display = "flex";
+}
+
+// авто-вход
+(async () => {
+  try {
+    const s = JSON.parse(localStorage.getItem("fpc3_session"));
+    if (s?.login && s?.pass) {
+      const res = await rpc("fpc_login", { p_login: s.login, p_password: s.pass });
+      if (res.ok) {
+        session = s;
+        loadLocal(s.login);
+        const d = res.data || {};
+        if (d.settings) S = {...DEFAULTS, ...d.settings};
+        if (d.customTiers) customTiers = d.customTiers;
+        if (d.bouquet) bouquet = d.bouquet;
+        enterApp();
+        return;
+      }
+    }
+  } catch {}
+})();
+
+/* ================= ДВИЖОК ================= */
 const monthStems = () => Math.max((+S.planned_bouquets || 1) * (+S.avg_stems || 1), 1);
 
-// Полная себестоимость стебля по компонентам
 function stemCost(purchase) {
   const delivery = S.delivery_mode === "paid"
     ? (+S.delivery_trip || 0) / Math.max(+S.stems_per_trip || 1, 1) : 0;
@@ -417,7 +602,7 @@ function stemPrice(purchase, tier, mode) {
            markup: purchase > 0 ? price / purchase : 0 };
 }
 
-/* ============ UI: СТЕБЕЛЬ ============ */
+/* ================= UI: СТЕБЕЛЬ ================= */
 let currentTier = null, currentResult = null;
 
 function detectTier(name) {
@@ -473,8 +658,8 @@ function recalcStem() {
     : `коэффициент плана ×${r.k}`;
 
   const rows = [
-    `<div class="l head"><span>Цена продажи стебля</span><b style="font-size:19px;color:var(--green-deep)">${fmt(r.price)}</b></div>`,
-    `<div class="l"><span>наценка на закупку ×${r.markup.toFixed(1)} · ${pathTxt}</span><b></b></div>`,
+    `<div class="l head"><span>Цена продажи стебля</span><b style="font-size:19px;color:var(--navy)">${fmt(r.price)}</b></div>`,
+    `<div class="l"><span>наценка ×${r.markup.toFixed(1)} · ${pathTxt}</span><b></b></div>`,
     `<div class="l"><span>закупка</span><b>${fmt(r.cost.landed - r.cost.delivery)}</b></div>`,
   ];
   if (S.delivery_mode === "paid") rows.push(`<div class="l"><span>доставка до салона</span><b>${fmt(r.cost.delivery)}</b></div>`);
@@ -493,7 +678,7 @@ function recalcStem() {
   box.innerHTML = `<div class="break" style="margin-top:12px">${rows.join("")}</div>`;
 }
 
-/* ============ UI: БУКЕТ ============ */
+/* ================= UI: БУКЕТ ================= */
 function addToBouquet() {
   const name = document.getElementById("stem-name").value.trim();
   const purchase = +document.getElementById("stem-price").value;
@@ -502,7 +687,6 @@ function addToBouquet() {
   if (ex) ex.qty += 1; else bouquet.push({ name, tier: currentTier, purchase, qty: 1 });
   save(); renderBouquet();
 }
-
 function chgQty(i, d) {
   bouquet[i].qty += d;
   if (bouquet[i].qty <= 0) bouquet.splice(i, 1);
@@ -567,7 +751,7 @@ function recalcBouquet() {
     + `<div class="l profit"><span>Чистая прибыль</span><b>${fmt(profit)}</b></div>`;
 }
 
-/* ============ НАСТРОЙКИ UI ============ */
+/* ================= НАСТРОЙКИ UI ================= */
 function setNum(k, v) { S[k] = +v || 0; save(); recalcStem(); renderBouquet(); }
 function setSeg(k, v) { S[k] = v; save(); syncUI(); recalcStem(); renderBouquet(); }
 function setVatOn(on) { S.vat_on = on; save(); syncUI(); recalcStem(); renderBouquet(); }
@@ -598,7 +782,7 @@ function syncUI() {
   document.getElementById("florist-salary").style.display = S.florist_mode === "salary" ? "block" : "none";
 }
 
-/* ============ СПРАВОЧНИК UI ============ */
+/* ================= СПРАВОЧНИК UI ================= */
 function renderDict() {
   const all = { ...FLOWER_DB, ...customTiers };
   const groups = { t1: [], t2: [], detail: [], green: [] };
@@ -618,9 +802,7 @@ function renderDatalist() {
 }
 
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#fbfdfc"); tg.setBackgroundColor("#fbfdfc"); }
-
-syncUI(); renderDatalist(); renderDict(); renderBouquet();
+if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor("#1b3a6b"); tg.setBackgroundColor("#f4f6fa"); }
 </script>
 </body>
 </html>
